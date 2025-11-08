@@ -67,22 +67,27 @@ class MainWindow(QMainWindow):
         tab_1_main = QHBoxLayout()
         tab_1_left = QVBoxLayout()
         tab_1_right = QVBoxLayout()
-        tab_1_right.setSpacing(0)
         
         tab_1_main.addLayout(tab_1_left)
         tab_1_main.addLayout(tab_1_right)
         tab_1_widget.setLayout(tab_1_main)
+      
 
         # Create widgets tab1
         self.search_pdf_input_word = QLineEdit()
         self.search_pdf_input_word.setPlaceholderText("Open File to search")
+
         self.search_pdf_combo = QComboBox()
         self.search_pdf_combo.addItems(["0.9","0.8","0.7","0.6","0.5","0.4","0.3","0.2","0.1"])
+
         self.search_found_label = QLabel("Search Pending")
+
         self.search_pdf_button = QPushButton("fuzzy search")
         self.search_pdf_button.clicked.connect(self.search_pdf)
         self.search_pdf_button.setEnabled(False)
+
         self.search_save_pdf_label = QLabel("0 pages to merge")
+
         self.save_pdf_button = QPushButton("save")
         self.save_pdf_button.setEnabled(False)
         self.save_pdf_button.clicked.connect(self.save_pdf)
@@ -96,6 +101,7 @@ class MainWindow(QMainWindow):
         tab_1_right.addWidget(self.search_pdf_combo)
         tab_1_right.addWidget(self.search_pdf_button)
         tab_1_right.addWidget(self.save_pdf_button)
+        
 
         # ---------------
         # | Tab 2 layout |
@@ -104,6 +110,7 @@ class MainWindow(QMainWindow):
         tab2_main = QHBoxLayout()
         tab2_left = QVBoxLayout()
         tab2_right = QVBoxLayout()
+        tab2_right.setAlignment(Qt.AlignTop) 
 
         tab2_main.addLayout(tab2_left)
         tab2_main.addLayout(tab2_right)
@@ -112,7 +119,7 @@ class MainWindow(QMainWindow):
         self.page_number_input = QListWidget()
         self.page_number_input.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.page_number_input.setEnabled(False)
-        self.page_number_input.itemSelectionChanged.connect(self.check_extract_selection_enabled)
+        self.page_number_input.itemSelectionChanged.connect(self.list_select)
         
         self.extract_pages_file_open_button = QPushButton("Open File")
         self.extract_pages_file_open_button.clicked.connect(self.open_path_to_extract_pages_button)
@@ -281,8 +288,15 @@ class MainWindow(QMainWindow):
 
     # 
     def tab_changed(self):
-        print("tab changed operations here")
+        print("new tab selected")
         self.clear_all_values()
+
+    def list_select(self):
+        print("item selected", self.page_number_input.selectedIndexes())
+        self.terminal_log.append("new selection")
+        for i in self.page_number_input.selectedIndexes():
+            print("index:" , i.row())
+            self.terminal_log.append(f"selected: {i.row()}")
 
     # open file only. open files can be searched or converted so needs to be focused
     #
