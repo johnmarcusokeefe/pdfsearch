@@ -1,4 +1,6 @@
-# source pdfsearch/bin/activate
+# mac: source pdfsearch/bin/activate
+# windows: venv\Scripts\activate.bat
+
 import sys, os, mimetypes, img2pdf, io
 from PIL import Image
 from PIL import ImageEnhance
