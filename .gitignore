@@ -1,0 +1,17 @@
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Editor/IDE specific files
+.idea/
+.vscode/
+
+# Other common ignore patterns
+.DS_Store
+._*
+/pdfsearch
