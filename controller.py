@@ -86,7 +86,7 @@ class MainController:
     # extracted to one file
     #
     def pdf_search(self, view, file_path, search_word, level):
-        print("pdf search", file_path, search_word, level)
+        view.terminal_log.append(f"pdf search path: {file_path} word: {search_word} level: {level}")
         fuzzy_max = 0.0
         fuzzy_total = 0.0
         view.status_bar_label.setText("Searching pdf for matches")

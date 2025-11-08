@@ -4,33 +4,7 @@ from PySide6.QtWidgets import *
 import os, time, subprocess
 import controller
 
-class FeedbackWindow(QDialog):
-    def __init__(self, file_list, parent=None):
-        super().__init__(parent)
 
-        self.setWindowTitle("Feedback Window")
-        list_widget = QListWidget()
-        layout = QVBoxLayout()
-
-        label = QLabel("Files Selected.")
-        i = 0
-        
-        for line in file_list:
-            list_widget.addItem(str(os.path.basename(line)))
-            i = i + 1
-
-        layout.addWidget(list_widget)
-
-        accept_button = QPushButton("Add Files")
-        accept_button.clicked.connect(self.accept) # Connect to accept or reject to close the dialog
-        cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(self.reject)
-
-        layout.addWidget(label)
-        layout.addWidget(accept_button)
-        layout.addWidget(cancel_button)
-        self.setLayout(layout)
-        
 class MainWindow(QMainWindow):
 
     def __init__(self, file_path, pages=[], file_list=[]):
@@ -165,7 +139,6 @@ class MainWindow(QMainWindow):
         tab3_main = QHBoxLayout()
         tab3_left = QVBoxLayout()
         tab3_right = QVBoxLayout()
-        tab3_right.setAlignment(Qt.AlignTop)
 
         tab3_main.addLayout(tab3_left)
         tab3_main.addLayout(tab3_right)
@@ -196,12 +169,10 @@ class MainWindow(QMainWindow):
         tab4_content = QWidget()
         tab4_main = QHBoxLayout()
         tab4_left = QVBoxLayout()
-        
         tab4_right = QVBoxLayout()
-        tab4_right.setAlignment(Qt.AlignTop)
 
-        tab4_main.addLayout(tab4_left, 3)
-        tab4_main.addLayout(tab4_right, 1)
+        tab4_main.addLayout(tab4_left)
+        tab4_main.addLayout(tab4_right)
         tab4_content.setLayout(tab4_main)
 
         self.extract_pdf_to_images_label = QLabel("PDF to Image:")
@@ -225,11 +196,8 @@ class MainWindow(QMainWindow):
 
         tab4_left.addWidget(self.extract_pdf_to_images_label)
         tab4_left.addWidget(self.pdf_to_image_page_count_label)
-        tab4_left.setAlignment(Qt.AlignTop)
-        
 
         tab4_right.addWidget(self.extract_pdf_to_images_open_files_button)
-        #self.extract_pdf_to_images_open_files_button.setFixedSize(QSize(150, 40))
         tab4_right.addWidget(self.extract_pdf_to_images_filetype)
         tab4_right.addWidget(self.extract_pdf_to_images_quality)
         tab4_right.addWidget(self.extract_pdf_to_images_button)
