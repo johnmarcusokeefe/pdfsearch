@@ -9,6 +9,7 @@ import Levenshtein as levenshtein
 import ocrmypdf
 from datetime import datetime
 from pdf2image import convert_from_path
+from pdf2docx import Converter
 
 import view
 
@@ -31,7 +32,7 @@ class MainController:
             reader = PdfReader(file_path)
             return len(reader.pages)
         except Exception as e:
-                print(f"Error saving file: {e}")
+            print(f"Error saving file: {e}")
         
     #
     # returns number of text searchable pages
@@ -56,17 +57,11 @@ class MainController:
         if is_text_plus_num_pages == 0:
             self.ocr_file(view, view.file_path)
             view.search_pdf_button.setEnabled(True)  
-            print("ocr complete ready for search")
         else:
             self.page_number_input.setEnabled(True)
             view.search_pdf_button.setEnabled(True)
             view.terminal_log(f"File page count: {is_text_plus_num_pages}")
             view.page_number_input.clear()
-            # for page in range(is_text_plus_num_pages):
-            #     self.page_number_input.addItem(str(page))
-            #self.page_number_input.addItems(self.pages)
-
-            print("check_if_ocr_required", str(self.pages))
             pages = self.check_pdf(view.file_path)
             view.page_count_label.setText(f"Page count: {pages}")
     #       
@@ -115,7 +110,7 @@ class MainController:
             # search text on page and if text found create an array of page numbers
                 # if text.lower().find(search_string.get().lower()) != -1:
                 #     print("text found on page ", page_num)
-        print(page_list)
+        print(f"pdf search page list: {page_list}")
         view.search_found_label.setText("No Matches Found")
         if len(page_list) > 0:
             fuzzy_average = round(fuzzy_total/len(page_list), 1)
@@ -285,7 +280,24 @@ class MainController:
             if 'image' in locals() and image:
                 image.close()
             # one page
-            return PdfReader(io.BytesIO(bytes_to_merge))  
+            return PdfReader(io.BytesIO(bytes_to_merge))
+    
+    def convert_pdf_to_word(docx_file_path, file_path):
+        print(file_path)
+        """
+        Converts a PDF file to a DOCX (Word) document.
+
+        Args:
+            pdf_file_path (str): The path to the input PDF file.
+            docx_file_path (str): The desired path for the output DOCX file.
+        """
+        try:
+            cv = Converter(file_path)
+            cv.convert(docx_file_path, start=0, end=None) # start and end pages (optional)
+            cv.close()
+            print(f"Successfully converted '{file_path}' to '{docx_file_path}'")
+        except Exception as e:
+            print(f"Error converting PDF to Word: {e}")
 
 
 

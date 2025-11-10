@@ -1,0 +1,24 @@
+ ┌────────────────────┐
+ │      MainWindow    │
+ │  (PySide GUI View) │
+ │  • Buttons, Labels │
+ │  • Emits Signals   │
+ └────────┬───────────┘
+          │
+          │  user clicks / selects
+          ▼
+ ┌────────────────────┐
+ │   MainController   │
+ │  • Receives signals│
+ │  • Calls model logic│
+ │  • Updates view     │
+ └────────┬───────────┘
+          │
+          │  file ops / OCR / data
+          ▼
+ ┌────────────────────┐
+ │   DocumentModel    │
+ │  • File list, path │
+ │  • PDF counting    │
+ │  • OCR processing  │
+ └────────────────────┘

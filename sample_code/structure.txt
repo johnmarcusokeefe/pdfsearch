@@ -1,0 +1,4 @@
+project/
+├── controller.py   ← connects view & model, manages logic
+├── model.py        ← handles file data, scanning, OCR, metadata
+└── view.py         ← builds GUI, emits signals, receives controller updates
