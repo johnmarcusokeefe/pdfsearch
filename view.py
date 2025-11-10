@@ -493,7 +493,7 @@ class MainWindow(QMainWindow):
     #
     def open_file_convert_pdf_to_word(self):
         self.open_file_dialog()
-        word_output = f"output/{os.path.basename(self.file_path)}.docx"
+        word_output = f"{self.file_path}.docx"
         controller.MainController.convert_pdf_to_word(word_output, self.file_path)
     #
     def pdf_to_image_button_check(self):
