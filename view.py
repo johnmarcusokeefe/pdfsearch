@@ -243,6 +243,7 @@ class MainWindow(QMainWindow):
         tab_5_content = QWidget()
         tab_5_main = QHBoxLayout()
         tab_5_left = QVBoxLayout()
+        tab_5_left.setAlignment(Qt.AlignTop)
         
         tab_5_right = QVBoxLayout()
         tab_5_right.setAlignment(Qt.AlignTop)
@@ -252,11 +253,22 @@ class MainWindow(QMainWindow):
         tab_5_content.setLayout(tab_5_main)
 
         self.extract_pdf_to_word_label = QLabel("PDF to Word:")
-        self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
-        self.extract_pdf_to_word_open_files_button.clicked.connect(self.open_file_convert_pdf_to_word)
-
         tab_5_left.addWidget(self.extract_pdf_to_word_label)
+        
+        self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
+        self.extract_pdf_to_word_open_files_button.clicked.connect(self.open_file_dialog)
         tab_5_right.addWidget(self.extract_pdf_to_word_open_files_button)
+
+        self.extract_pdf_to_word_label = QLabel("Extract")
+        tab_5_left.addWidget(self.extract_pdf_to_word_label)
+
+        self.extract_pdf_to_word_button = QPushButton("Word")
+        self.extract_pdf_to_word_button.clicked.connect(self.convert_pdf_to_word)
+        tab_5_right.addWidget(self.extract_pdf_to_word_button)
+
+        self.extract_pdf_to_text_button = QPushButton("Text")
+        self.extract_pdf_to_text_button.clicked.connect(lambda : self.ctr.extract_text(self.file_path))
+        tab_5_right.addWidget(self.extract_pdf_to_text_button)
 
         
         # Add tabs to main tab widget
@@ -294,8 +306,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     # --- Rest of your class methods unchanged ---
-
-
     #
     def check_extract_selection_enabled(self):
         selected_items = self.page_number_input.selectedItems()
@@ -355,23 +365,25 @@ class MainWindow(QMainWindow):
         for i in self.page_number_input.selectedIndexes():
             print("index:" , i.row())
             self.terminal_log.append(f"selected: {i.row()}")
-
+    #
     # open file only. open files can be searched or converted so needs to be focused
     #
     def open_file_dialog(self):
         # Open a file dialog to select a single file
 
         last_directory = self.load_text("output/last_opened.txt")
+        
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Open File",  # Dialog title
-            "test_data",      # Initial directory (can be an empty string for default)
+            str(last_directory),      # Initial directory (can be an empty string for default)
             "PDF Files (*.pdf);;All Files (*.*)" # File filters
         )
         if file_path:
             self.file_path = file_path
+            print("file path open file dialog", file_path)
+            self.save_text(file_path, "output/last_opened.txt")
             self.status_bar_label.setText("file path opened successfull")
-            self.pdf_to_image_button_check()
         else:
             self.terminal_log.append("No file selected")
     #
@@ -386,7 +398,7 @@ class MainWindow(QMainWindow):
             self.file_size = round(os.path.getsize(self.file_path)/1024/1024, 1)
             self.file_size_label.setText(f"Files Size: {self.file_size} MB")
             #
-            # if pages found returns a count otherwise 0
+            # if pages found returns a count otherwise 0v
             #self.page_count = self.is_text_plus_num_pages
             self.terminal_log.append(f"Selected file: {self.file_path}")
 
@@ -490,14 +502,15 @@ class MainWindow(QMainWindow):
         self.pdf_to_image_page_count_label.setText(f"Pages to convert: {num_pages}")
         self.terminal_log.setText(f"Filepath: {self.file_path} loaded with {num_pages} pages")
         #self.extract_pdf_to_images_button.setText(f"Pages to convert: {num_pages}")
-    #
-    def open_file_convert_pdf_to_word(self):
-        self.open_file_dialog()
+    # tab 5
+    def convert_pdf_to_word(self):
         word_output = f"{self.file_path}.docx"
         controller.MainController.convert_pdf_to_word(word_output, self.file_path)
     #
+    # check if image conversion buttons are selected
+    #
     def pdf_to_image_button_check(self):
-        self.terminal_log.append("filetype/imagequality change")
+        #self.terminal_log.append("filetype/imagequality change")
         if self.extract_pdf_to_images_filetype.currentIndex() > 0 and self.extract_pdf_to_images_quality.currentIndex() > 0:
             self.extract_pdf_to_images_button.setEnabled(True)
         else:
@@ -587,16 +600,15 @@ class MainWindow(QMainWindow):
             dpi = 300
         # called convert to images using thread
         out_path, count = self.thread_manager.connect(self.ctr.pdf_to_image(self, dpi, file_t))
-
         self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
 
     # use to save last folder accessed
-    def save_text(self, data, output_path, option):
-        with open(output_path, option) as file:
-            file.write(data + "\n")
-    
+    def save_text(self, output_path_text, output_path):
+        dir_name = os.path.dirname(output_path_text)
+        with open(output_path,'w') as file:
+            file.write(dir_name)
+    #
     def set_file_path(self, new_file_path):
-
         self.file_path = new_file_path
 
     # get text file data
@@ -605,5 +617,5 @@ class MainWindow(QMainWindow):
             with open(filename, "r") as file:
                 return [line.strip() for line in file.readlines()]
         except FileNotFoundError:
-            return []
+            return "output"
   

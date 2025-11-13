@@ -1,15 +1,17 @@
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
-
+import warnings
 import sys, os, mimetypes, img2pdf, io
 from PIL import Image
 from PIL import ImageEnhance
+warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 from pypdf import *
 import Levenshtein as levenshtein
 import ocrmypdf
 from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
+
 
 import view
 
@@ -24,6 +26,7 @@ class MainController:
         
         self.file_path = file_path
         self.file_list = file_list
+        
 
     # check the pdf is text searchable if not enable ocr button
     #
@@ -136,6 +139,21 @@ class MainController:
         #view.output_label.setText(output_pdf_path)
         view.set_file_path(output_pdf_path)
         view.search_pdf_button.setEnabled(True)
+    
+    # extract text to file
+    def extract_text(self, file_path):
+        
+        output_pdf_path = "output/test_text.txt"
+        #view.MainWindow.status_bar_label.setText("extract text")
+        reader = PdfReader(file_path)
+        for page_number in range(len(reader.pages)):
+            page = reader.pages[page_number]
+            text = page.extract_text()
+            with open(output_pdf_path, 'a') as file:
+                file.write(text)
+        
+
+        print(f"File '{file_path}' created and written to.")
 
     #
     # todo: option to attach to existing file
@@ -281,7 +299,9 @@ class MainController:
                 image.close()
             # one page
             return PdfReader(io.BytesIO(bytes_to_merge))
-    
+    #
+    #
+    #
     def convert_pdf_to_word(docx_file_path, file_path):
         print(file_path)
         """
