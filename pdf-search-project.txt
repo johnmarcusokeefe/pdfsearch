@@ -1,6 +1,0 @@
-search pdf
-convert pdf to text
-combine pdfs
-split pdfs
-convert image to pdf
-convert pdf to image

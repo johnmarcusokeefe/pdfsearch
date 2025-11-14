@@ -1,4 +1,4 @@
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import Qt, QThreadPool
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 import os, time, subprocess
@@ -223,6 +223,8 @@ class MainWindow(QMainWindow):
         self.extract_pdf_to_images_button.setEnabled(False)
         self.extract_pdf_to_images_button.clicked.connect(self.pdf_to_image_button)
 
+        self.thread_manager = QThreadPool()
+
         tab4_left.addWidget(self.extract_pdf_to_images_label)
         tab4_left.addWidget(self.pdf_to_image_page_count_label)
         tab4_left.setAlignment(Qt.AlignTop)
@@ -234,11 +236,35 @@ class MainWindow(QMainWindow):
         tab4_right.addWidget(self.extract_pdf_to_images_quality)
         tab4_right.addWidget(self.extract_pdf_to_images_button)
 
+        
+        # ---------------
+        # | Tab 5 layout |
+        # ---------------
+        tab_5_content = QWidget()
+        tab_5_main = QHBoxLayout()
+        tab_5_left = QVBoxLayout()
+        
+        tab_5_right = QVBoxLayout()
+        tab_5_right.setAlignment(Qt.AlignTop)
+
+        tab_5_main.addLayout(tab_5_left, 3)
+        tab_5_main.addLayout(tab_5_right, 1)
+        tab_5_content.setLayout(tab_5_main)
+
+        self.extract_pdf_to_word_label = QLabel("PDF to Word:")
+        self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
+        self.extract_pdf_to_word_open_files_button.clicked.connect(self.open_file_convert_pdf_to_word)
+
+        tab_5_left.addWidget(self.extract_pdf_to_word_label)
+        tab_5_right.addWidget(self.extract_pdf_to_word_open_files_button)
+
+        
         # Add tabs to main tab widget
         self.tab_widget.addTab(tab_1_widget, "Search PDF")
         self.tab_widget.addTab(tab2_content, "Extract PDF")
         self.tab_widget.addTab(tab3_content, "Join Files")
         self.tab_widget.addTab(tab4_content, "File Conversions")
+        self.tab_widget.addTab(tab_5_content, "PDF to Text")
         
         self.tab_widget.setFixedHeight(250)
         self.tab_widget.currentChanged.connect(self.tab_changed)
@@ -465,6 +491,11 @@ class MainWindow(QMainWindow):
         self.terminal_log.setText(f"Filepath: {self.file_path} loaded with {num_pages} pages")
         #self.extract_pdf_to_images_button.setText(f"Pages to convert: {num_pages}")
     #
+    def open_file_convert_pdf_to_word(self):
+        self.open_file_dialog()
+        word_output = f"{self.file_path}.docx"
+        controller.MainController.convert_pdf_to_word(word_output, self.file_path)
+    #
     def pdf_to_image_button_check(self):
         self.terminal_log.append("filetype/imagequality change")
         if self.extract_pdf_to_images_filetype.currentIndex() > 0 and self.extract_pdf_to_images_quality.currentIndex() > 0:
@@ -554,8 +585,9 @@ class MainWindow(QMainWindow):
             dpi = 150
         else: 
             dpi = 300
+        # called convert to images using thread
+        out_path, count = self.thread_manager.connect(self.ctr.pdf_to_image(self, dpi, file_t))
 
-        out_path, count = self.ctr.pdf_to_image(self, dpi, file_t)
         self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
 
     # use to save last folder accessed
