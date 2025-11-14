@@ -1,21 +1,23 @@
 # view.py
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QLabel, QListWidget, QFileDialog, QDialog, QCheckBox, QTabWidget, QLineEdit, QComboBox,
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QLabel, QListWidget, QDialog, QCheckBox, QTabWidget, QLineEdit, QComboBox,
     QAbstractItemView, QTextEdit
 )
 from PySide6.QtCore import Qt
-import os, time, subprocess
-from controller import MainController
+import os, subprocess
+
 from fileview import FileDialogue
 
 class FeedbackWindow(QDialog):
 
-   def __init__(self, file_list):
+   def __init__(self):
 
         self.setWindowTitle("Feedback Window")
         layout = QVBoxLayout(self)
         
+        file_list = []
+
         label = QLabel("Files Selected:")
         self.list_widget = QListWidget()
         i = 0
@@ -38,11 +40,12 @@ class FeedbackWindow(QDialog):
         
 class MainWindow(QMainWindow):
 
-    def __init__(self, file_path, file_list):
-        
+    def __init__(self):
+        super().__init__()
+
+        self.filedialog = FileDialogue()
+
         self.setWindowTitle("Scan and Search")
-        self.file_path = file_path
-        self.file_list = file_list
         
         self.custom_file_name = ""
     
@@ -256,8 +259,8 @@ class MainWindow(QMainWindow):
         tab_5_left.addWidget(self.extract_pdf_to_word_label)
         
         self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
-        self.extract_pdf_to_word_open_files_button.clicked.connect(self.open_file_dialog)
-        self.extract_pdf_to_word_open_files_button.clicked.connect(self.open_file_dialog)
+        self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
+        self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
         tab_5_right.addWidget(self.extract_pdf_to_word_open_files_button)
 
         self.extract_pdf_to_word_label = QLabel("Extract")
@@ -300,6 +303,7 @@ class MainWindow(QMainWindow):
 
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
+
 
     # --- Rest of your class methods unchanged ---
     #
@@ -375,7 +379,7 @@ class MainWindow(QMainWindow):
 
         if tab_name == "extract":
             self.split_pdf_save_file_button.setEnabled(True)
-            page_count = MainController.count_pdf_pages(self, self.file_path)
+            page_count = self.count_pdf_pages(self, self.file_path)
             print("extract pages", page_count)
             # loads list of files
             if page_count > 0:
@@ -391,7 +395,7 @@ class MainWindow(QMainWindow):
     # tab1 - search pdf - set search path
     def open_path_for_search_button(self):
         #
-        file_path = self.open_file_dialog()
+        file_path = self.filedialog.open_file_dialog()
         # update feedback labels
         self.is_text_plus_num_pages = self.ctl.check_pdf(file_path)
         if self.is_text_plus_num_pages > 0:
@@ -402,18 +406,18 @@ class MainWindow(QMainWindow):
     # tab 2
     def open_path_to_extract_pages_button(self):
         self.page_number_input.clear()
-        self.open_file_dialog()
+        self.filedialog.open_file_dialog()
         # update feedback labels
         self.update_labels("extract")
     # tab 3
     def open_files_to_join_button(self):
         print("open files to join")
-        file_list = self.open_multiple_files_dialog()
+        file_list = self.filedialog.open_multiple_file_dialog()
         self.file_list_display.addItems(file_list)
 
     # tab 4
     def open_file_convert_pdf_to_image(self):
-        file_path = self.open_file_dialog()
+        file_path = self.filedialog.open_file_dialog()
         self.extract_pdf_to_images_label.setText(f"Pdf to Image file path: {file_path}")
         self.extract_pdf_to_images_filetype.setEnabled(True)
         self.extract_pdf_to_images_quality.setEnabled(True)
@@ -421,12 +425,11 @@ class MainWindow(QMainWindow):
         self.pdf_to_image_page_count_label.setText(f"Pages to convert: {num_pages}")
         self.terminal_log.setText(f"Filepath: {file_path} loaded with {num_pages} pages")
         #self.extract_pdf_to_images_button.setText(f"Pages to convert: {num_pages}")
-    # tab 5
-    def convert_pdf_to_word(self):
+   
     # tab 5
     def convert_pdf_to_word(self):
         word_output = f"{self.file_path}.docx"
-        MainController.convert_pdf_to_word(word_output, self.file_path)
+        #MainController.convert_pdf_to_word(word_output, self.file_path)
     #
     # check if image conversion buttons are selected
     #
@@ -491,7 +494,7 @@ class MainWindow(QMainWindow):
             return False
     
     def save_file_list(self):
-        file_name = self.save_file_dialog()
+        file_name = self.filedialog.save_file_dialog()
         self.ctl.merge_pdfs(self.ctl, self, file_name)
     
     def get_level(self):
@@ -519,17 +522,5 @@ class MainWindow(QMainWindow):
         out_path, count = self.ctr.pdf_to_image(self, dpi, file_t)
         self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
 
-    
-    #
-    def set_file_path(self, new_file_path):
-        self.file_path = new_file_path
 
-    def get_file_path(self):
-        return self.file_path
-    
-    def set_file_list(self, new_file_list):
-        self.file_list = new_file_list
-
-    def get_file_path(self):
-        return self.file_list
   

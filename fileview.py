@@ -1,14 +1,12 @@
 from PySide6.QtWidgets import (
     QFileDialog
 )
-from view import MainWindow
+import time
 
 #
     # open file only. open files can be searched or converted so needs to be focused
     #
 class FileDialogue:
-    def __init__(self):
-        super().__init__()
 
       
     # Open a file dialog to select a single file

@@ -12,19 +12,20 @@ import ocrmypdf
 from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
+from PySide6.QtWidgets import QApplication
 
 from view import MainWindow
-
-from PySide6.QtWidgets import QApplication
 
 #
 # Subclass QMainWindow to customize your application's main window
 #
 class MainController(MainWindow):
 
-    def __init__(self, file_path, file_list):
-        super().__init__(file_path, file_list)
-        
+
+    def __init__(self):
+        # file_path and file_list are from mainwindow
+        super().__init__()
+    
 
     # search button method
     def search_pdf(self):
@@ -306,7 +307,9 @@ class MainController(MainWindow):
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
-    window = view.MainWindow()
+
+    window = MainController()
+    
     window.show()
 
     sys.exit(app.exec())
