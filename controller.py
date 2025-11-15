@@ -14,21 +14,20 @@ from pdf2image import convert_from_path
 from pdf2docx import Converter
 
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import Signal, QObject
 
 from view import MainWindow
-from fileview import FileDialogue
-
 #
 # Subclass QMainWindow to customize your application's main window
 #
-class MainController(MainWindow):
+class MainController(QObject):
     
-    def __init__(self):
-        # file_path and file_list are from mainwindow
+    def __init__(self, view):
         super().__init__()
         
+        self._view = view 
         
-
+        self._view.open_file_button.clicked.connect(self._view.open_file_path)
     # search button method
     def search_pdf(self):
         self.view.found_list = self.pdf_search(self.file_path, self.view.get_search_word(), self.view.get_level())
@@ -310,8 +309,8 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    window = MainController()
+    view = MainWindow()
+    controller = MainController(view)
     
-    window.show()
-
+    view.show()
     sys.exit(app.exec())

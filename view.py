@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
         
         
         self.open_file_button = QPushButton("open file")
-        self.open_file_button.clicked.connect(self.open_file_path)
+        #self.open_file_button.clicked.connect(self.open_file_path)
 
         # Create widgets tab1
         self.search_pdf_input_word = QLineEdit()
