@@ -70,8 +70,7 @@ class MainWindow(QMainWindow):
         self.current_directory_label = QLabel(f"Current Directory: {self.current_directory}")
         self.output_file_label = QLabel(f"Output Path:")
 
-        self.open_file_button = QPushButton("open file")
-        self.open_file_button.clicked.connect(self.open_file_path)
+       
         
         self.page_count_label = QLabel(f"Page Count: {self.page_count}")
         self.file_size_label = QLabel(f"Files Size: {self.file_size}")
@@ -101,7 +100,10 @@ class MainWindow(QMainWindow):
         tab_1_main.addLayout(tab_1_left)
         tab_1_main.addLayout(tab_1_right)
         tab_1_widget.setLayout(tab_1_main)
-      
+        
+        
+        self.open_file_button = QPushButton("open file")
+        self.open_file_button.clicked.connect(self.open_file_path)
 
         # Create widgets tab1
         self.search_pdf_input_word = QLineEdit()
