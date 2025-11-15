@@ -66,12 +66,12 @@ class MainWindow(QMainWindow):
         self.file_size = ""
         self.file_selected_count = 0
        
-        self.file_open_label = QLabel(f"Input path:")
+        self.open_file_label = QLabel(f"Input path:")
         self.current_directory_label = QLabel(f"Current Directory: {self.current_directory}")
         self.output_file_label = QLabel(f"Output Path:")
 
-        self.file_open_button = QPushButton("open file")
-        self.file_open_button.clicked.connect(self.open_path_for_search_button)
+        self.open_file_button = QPushButton("open file")
+        self.open_file_button.clicked.connect(self.open_file_path)
         
         self.page_count_label = QLabel(f"Page Count: {self.page_count}")
         self.file_size_label = QLabel(f"Files Size: {self.file_size}")
@@ -122,12 +122,12 @@ class MainWindow(QMainWindow):
         self.save_pdf_button.setEnabled(False)
         self.save_pdf_button.clicked.connect(self.save_pdf)
 
-        tab_1_left.addWidget(self.file_open_label)
+        tab_1_left.addWidget(self.open_file_label)
         tab_1_left.addWidget(self.search_pdf_input_word)
         tab_1_left.addWidget(self.search_found_label)
         tab_1_left.addWidget(self.search_save_pdf_label)
 
-        tab_1_right.addWidget(self.file_open_button)
+        tab_1_right.addWidget(self.open_file_button)
         tab_1_right.addWidget(self.search_pdf_combo)
         tab_1_right.addWidget(self.search_pdf_button)
         tab_1_right.addWidget(self.save_pdf_button)
@@ -373,7 +373,6 @@ class MainWindow(QMainWindow):
             self.file_size_label.setText(f"Files Size: {self.file_size} MB")
             #
             # if pages found returns a count otherwise 0v
-            # if pages found returns a count otherwise 0v
             #self.page_count = self.is_text_plus_num_pages
             self.terminal_log.append(f"Selected file: {self.file_path}")
 
@@ -393,15 +392,17 @@ class MainWindow(QMainWindow):
    
 
     # tab1 - search pdf - set search path
-    def open_path_for_search_button(self):
+    def open_file_path(self):
         #
+        print("open file path")
         file_path = self.filedialog.open_file_dialog()
         # update feedback labels
-        self.is_text_plus_num_pages = self.ctl.check_pdf(file_path)
-        if self.is_text_plus_num_pages > 0:
-            self.search_pdf_button.setEnabled(True)
-        else:
-            self.ctr.check_if_ocr_required(self, self.is_text_plus_num_pages)
+        print(file_path)
+        # self.is_text_plus_num_pages = self.check_pdf(file_path)
+        # if self.is_text_plus_num_pages > 0:
+        #     self.search_pdf_button.setEnabled(True)
+        # else:
+        #     self.ctr.check_if_ocr_required(self, self.is_text_plus_num_pages)
         self.update_labels("search")
     # tab 2
     def open_path_to_extract_pages_button(self):
