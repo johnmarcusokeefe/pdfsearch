@@ -7,9 +7,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 import os, subprocess
 
-
-
-
 class FeedbackWindow(QDialog):
 
    def __init__(self):
@@ -99,7 +96,7 @@ class MainWindow(QMainWindow):
         
         self.open_file_label = QLabel(f"Input path:")
         self.open_file_button = QPushButton("open file")
-        #self.open_file_button.clicked.connect(self.open_file_path)
+        
 
         # Create widgets tab1
         self.search_pdf_input_word = QLineEdit()

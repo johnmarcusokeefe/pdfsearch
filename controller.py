@@ -1,10 +1,9 @@
 # controller.py
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
-import warnings
-import sys, os, mimetypes, img2pdf, io
-from PIL import Image
-from PIL import ImageEnhance
+
+import sys, os, mimetypes, img2pdf, io, warnings
+from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 from pypdf import *
 import Levenshtein as levenshtein
@@ -28,16 +27,18 @@ class MainController(QObject):
         # create an instance of the view
         self._view = view
         self._fileview = fileview 
+        self.file_path = ""
+        self._view.open_file_button.clicked.connect(self.open_file_path)
         
-        self._view.open_file_button.clicked.connect(self._fileview.open_file_dialog)
+       
     # search button method
     # moved from view
     def open_file_path(self):
         #
         print("open file path")
-        file_path = self.open_file_path()
+        file_path = self._fileview.open_file_dialog()
         # update feedback labels
-        # print(file_path)
+        print(file_path)
         
         is_text_searchable = self.check_pdf(file_path)
         
@@ -46,6 +47,7 @@ class MainController(QObject):
             self._view.search_pdf_button.setEnabled(True)
         else:
             self.check_if_ocr_required(self, is_text_searchable)
+
         self._view.update_labels("search", file_path)
 
 

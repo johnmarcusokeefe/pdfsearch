@@ -10,6 +10,7 @@ class FileDialogue:
 
     def __init__(self):
         super().__init__()
+
         
     # Open a file dialog to select a single file
     def open_file_dialog(self):
@@ -22,8 +23,9 @@ class FileDialogue:
             "output",      # Initial directory (can be an empty string for default)
             "PDF Files (*.pdf);;All Files (*.*)" # File filters
         )
-
         return file_path
+
+       
 
     
     def open_multiple_file_dialog(self):
