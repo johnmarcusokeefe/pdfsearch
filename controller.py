@@ -23,19 +23,19 @@ from fileview import FileDialogue
 #
 class MainController(QObject):
     
-    def __init__(self, view):
+    def __init__(self, view, fileview):
         super().__init__()
         # create an instance of the view
-        self._view = view 
+        self._view = view
+        self._fileview = fileview 
         
-        self._view.open_file_button.clicked.connect(self.open_file_path)
+        self._view.open_file_button.clicked.connect(self._fileview.open_file_dialog)
     # search button method
     # moved from view
     def open_file_path(self):
         #
         print("open file path")
-        file_path = self.filedialog.open_file_dialog()
-
+        file_path = self.open_file_path()
         # update feedback labels
         # print(file_path)
         
@@ -330,7 +330,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     view = MainWindow()
-    controller = MainController(view)
+    fileview = FileDialogue()
+    controller = MainController(view, fileview)
     
     view.show()
     sys.exit(app.exec())

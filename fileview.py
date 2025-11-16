@@ -10,6 +10,7 @@ class FileDialogue:
 
     def __init__(self):
         super().__init__()
+        
     # Open a file dialog to select a single file
     def open_file_dialog(self):
         

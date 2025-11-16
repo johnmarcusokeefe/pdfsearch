@@ -42,8 +42,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-    
-        self.filedialog = FileDialogue()
 
         self.setWindowTitle("Scan and Search")
         
@@ -259,8 +257,8 @@ class MainWindow(QMainWindow):
         tab_5_left.addWidget(self.extract_pdf_to_word_label)
         
         self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
-        self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
-        self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
+        # self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
+        # self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
         tab_5_right.addWidget(self.extract_pdf_to_word_open_files_button)
 
         self.extract_pdf_to_word_label = QLabel("Extract")
@@ -411,18 +409,18 @@ class MainWindow(QMainWindow):
     # tab 2
     def open_path_to_extract_pages_button(self):
         self.page_number_input.clear()
-        self.filedialog.open_file_dialog()
+        #self.filedialog.open_file_dialog()
         # update feedback labels
         self.update_labels("extract")
     # tab 3
     def open_files_to_join_button(self):
         print("open files to join")
-        file_list = self.filedialog.open_multiple_file_dialog()
+        #file_list = self.filedialog.open_multiple_file_dialog()
         self.file_list_display.addItems(file_list)
 
     # tab 4
     def open_file_convert_pdf_to_image(self):
-        file_path = self.filedialog.open_file_dialog()
+        #file_path = self.filedialog.open_file_dialog()
         self.extract_pdf_to_images_label.setText(f"Pdf to Image file path: {file_path}")
         self.extract_pdf_to_images_filetype.setEnabled(True)
         self.extract_pdf_to_images_quality.setEnabled(True)
@@ -499,7 +497,7 @@ class MainWindow(QMainWindow):
             return False
     
     def save_file_list(self):
-        file_name = self.filedialog.save_file_dialog()
+        #file_name = self.filedialog.save_file_dialog()
         self.ctl.merge_pdfs(self.ctl, self, file_name)
     
     def get_level(self):
