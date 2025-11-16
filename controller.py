@@ -17,6 +17,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Signal, QObject
 
 from view import MainWindow
+from fileview import FileDialogue
 #
 # Subclass QMainWindow to customize your application's main window
 #
@@ -24,15 +25,30 @@ class MainController(QObject):
     
     def __init__(self, view):
         super().__init__()
-
-        self.file_path = file_path
-        self.file_list = file_list
-
-        
+        # create an instance of the view
         self._view = view 
         
-        self._view.open_file_button.clicked.connect(self._view.open_file_path)
+        self._view.open_file_button.clicked.connect(self.open_file_path)
     # search button method
+    # moved from view
+    def open_file_path(self):
+        #
+        print("open file path")
+        file_path = self.filedialog.open_file_dialog()
+
+        # update feedback labels
+        # print(file_path)
+        
+        is_text_searchable = self.check_pdf(file_path)
+        
+        print(is_text_searchable)
+        if is_text_searchable > 0:
+            self._view.search_pdf_button.setEnabled(True)
+        else:
+            self.check_if_ocr_required(self, is_text_searchable)
+        self._view.update_labels("search", file_path)
+
+
     def search_pdf(self):
         self.view.found_list = self.pdf_search(self.file_path, self.view.get_search_word(), self.view.get_level())
         if len(self.view.found_list) == 0:

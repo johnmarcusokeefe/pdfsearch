@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 import os, subprocess
 
-from fileview import FileDialogue
+
 
 
 class FeedbackWindow(QDialog):
@@ -392,22 +392,22 @@ class MainWindow(QMainWindow):
    
 
     # tab1 - search pdf - set search path
-    def open_file_path(self):
-        #
-        print("open file path")
-        file_path = self.filedialog.open_file_dialog()
+    # def open_file_path(self):
+    #     #
+    #     print("open file path")
+    #     file_path = self.filedialog.open_file_dialog()
 
-        # update feedback labels
-        print(file_path)
+    #     # update feedback labels
+    #     # print(file_path)
         
-        self.is_text_searchable = self.controller.check_pdf(file_path)
+    #     is_text_searchable = self.con.check_pdf(file_path)
         
-        print(self.is_text_searchable)
-        # if self.is_text_plus_num_pages > 0:
-        #     self.search_pdf_button.setEnabled(True)
-        # else:
-        #     self.ctr.check_if_ocr_required(self, self.is_text_plus_num_pages)
-        self.update_labels("search", file_path)
+    #     print(self.is_text_searchable)
+    #     # if self.is_text_plus_num_pages > 0:
+    #     #     self.search_pdf_button.setEnabled(True)
+    #     # else:
+    #     #     self.ctr.check_if_ocr_required(self, self.is_text_plus_num_pages)
+    #     self.update_labels("search", file_path)
     # tab 2
     def open_path_to_extract_pages_button(self):
         self.page_number_input.clear()
