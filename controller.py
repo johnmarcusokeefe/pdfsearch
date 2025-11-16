@@ -16,16 +16,18 @@ from pdf2docx import Converter
 from PySide6.QtWidgets import QApplication
 
 from view import MainWindow
-from fileview import FileDialogue
 
 #
 # Subclass QMainWindow to customize your application's main window
 #
-class MainController(MainWindow):
+class MainController:
     
-    def __init__(self):
-        # file_path and file_list are from mainwindow
+    def __init__(self, file_path, file_list):
         super().__init__()
+
+        self.file_path = file_path
+        self.file_list = file_list
+
         
         
 
@@ -309,8 +311,8 @@ class MainController(MainWindow):
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
-
-    window = MainController()
+ 
+    window = MainWindow()
     
     window.show()
 
