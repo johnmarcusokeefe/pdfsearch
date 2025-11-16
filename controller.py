@@ -24,6 +24,10 @@ class MainController(QObject):
     
     def __init__(self, view):
         super().__init__()
+
+        self.file_path = file_path
+        self.file_list = file_list
+
         
         self._view = view 
         

@@ -8,10 +8,11 @@ import time
     #
 class FileDialogue:
 
-      
+    def __init__(self):
+        super().__init__()
     # Open a file dialog to select a single file
     def open_file_dialog(self):
-
+        
         #last_directory = self.load_text("output/last_opened.txt")
    
         file_path, _ = QFileDialog.getOpenFileName(
@@ -20,15 +21,7 @@ class FileDialogue:
             "output",      # Initial directory (can be an empty string for default)
             "PDF Files (*.pdf);;All Files (*.*)" # File filters
         )
-        # if file_path:
-        #     self.file_path = file_path
-        #     print("file path open file dialog", file_path)
-        #     self.save_text(file_path, "output/last_opened.txt")
-        #     self.status_bar_label.setText("file path opened successfull")
-        # else:
-        #     self.terminal_log.append("No file selected")
 
-        #
         return file_path
 
     

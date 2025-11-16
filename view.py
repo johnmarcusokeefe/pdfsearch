@@ -9,13 +9,13 @@ import os, subprocess
 
 from fileview import FileDialogue
 
+
 class FeedbackWindow(QDialog):
 
    def __init__(self):
 
         self.setWindowTitle("Feedback Window")
         layout = QVBoxLayout(self)
-        
         file_list = []
 
         label = QLabel("Files Selected:")
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
+    
         self.filedialog = FileDialogue()
 
         self.setWindowTitle("Scan and Search")
@@ -65,12 +65,9 @@ class MainWindow(QMainWindow):
         self.page_count = ""
         self.file_size = ""
         self.file_selected_count = 0
-       
-        self.open_file_label = QLabel(f"Input path:")
+    
         self.current_directory_label = QLabel(f"Current Directory: {self.current_directory}")
         self.output_file_label = QLabel(f"Output Path:")
-
-       
         
         self.page_count_label = QLabel(f"Page Count: {self.page_count}")
         self.file_size_label = QLabel(f"Files Size: {self.file_size}")
@@ -102,6 +99,7 @@ class MainWindow(QMainWindow):
         tab_1_widget.setLayout(tab_1_main)
         
         
+        self.open_file_label = QLabel(f"Input path:")
         self.open_file_button = QPushButton("open file")
         #self.open_file_button.clicked.connect(self.open_file_path)
 
@@ -363,20 +361,20 @@ class MainWindow(QMainWindow):
             print("index:" , i.row())
             self.terminal_log.append(f"selected: {i.row()}")
     
-    def update_labels(self, tab_name):
+    def update_labels(self, tab_name, file_path):
         
         if tab_name == "search":
             # sets search button enabled when file loaded. may not be text
-            self.file_name = os.path.basename(self.file_path)
-            self.file_open_label.setText(f"Input Path: {self.file_path}")
-            self.current_directory = os.path.dirname(self.file_path)
+            self.file_name = os.path.basename(file_path)
+            self.open_file_label.setText(f"Input Path: {file_path}")
+            self.current_directory = os.path.dirname(file_path)
             self.current_directory_label.setText(f"Current directory: {self.current_directory}")
-            self.file_size = round(os.path.getsize(self.file_path)/1024/1024, 1)
+            self.file_size = round(os.path.getsize(file_path)/1024/1024, 1)
             self.file_size_label.setText(f"Files Size: {self.file_size} MB")
             #
             # if pages found returns a count otherwise 0v
             #self.page_count = self.is_text_plus_num_pages
-            self.terminal_log.append(f"Selected file: {self.file_path}")
+            self.terminal_log.append(f"Selected file: {file_path}")
 
         if tab_name == "extract":
             self.split_pdf_save_file_button.setEnabled(True)
@@ -398,14 +396,18 @@ class MainWindow(QMainWindow):
         #
         print("open file path")
         file_path = self.filedialog.open_file_dialog()
+
         # update feedback labels
         print(file_path)
-        # self.is_text_plus_num_pages = self.check_pdf(file_path)
+        
+        self.is_text_searchable = self.controller.check_pdf(file_path)
+        
+        print(self.is_text_searchable)
         # if self.is_text_plus_num_pages > 0:
         #     self.search_pdf_button.setEnabled(True)
         # else:
         #     self.ctr.check_if_ocr_required(self, self.is_text_plus_num_pages)
-        self.update_labels("search")
+        self.update_labels("search", file_path)
     # tab 2
     def open_path_to_extract_pages_button(self):
         self.page_number_input.clear()
