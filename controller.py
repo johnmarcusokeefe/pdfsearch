@@ -28,34 +28,41 @@ class MainController(QObject):
         self._view = view
         self._fileview = fileview 
         self.file_path = ""
-        self._view.open_file_button.clicked.connect(self.open_file_path)
-        
+        self.found_list = []
+        # connect signals and slots
+        self.connect_signals()
        
+    def connect_signals(self):
+        self._view.open_file_button.clicked.connect(self.open_file_path)
+        self._view.search_pdf_button.clicked.connect(self.search_pdf)
+        # self._view.save_pdf_button.clicked.connect(lambda: self.save_pdf(self._view.get_search_word(), self._view.found_list))
+        # self._view.extract_pdf_button.clicked.connect(lambda: self.extract_pdfs(self._view.file_path, self._view.found_list))
+        # self._view.merge_pdf_button.clicked.connect(lambda: self.merge_pdfs(self._view.get_merge_file_name(), self._view.get_merge_file_list()))
+    
+    
     # search button method
     # moved from view
     def open_file_path(self):
         #
-        print("open file path")
         file_path = self._fileview.open_file_dialog()
         # update feedback labels
-        print(file_path)
-        
+        print("open file path",file_path)
         is_text_searchable = self.check_pdf(file_path)
-        
-        print(is_text_searchable)
+        print("is text searchable",is_text_searchable)
         if is_text_searchable > 0:
             self._view.search_pdf_button.setEnabled(True)
         else:
-            self.check_if_ocr_required(self, is_text_searchable)
-
+            self.check_if_ocr_required(file_path, is_text_searchable)
         self._view.update_labels("search", file_path)
+    #
+    #
+    #
+    def search_pdf(self, file_path):
 
-
-    def search_pdf(self):
-        self.view.found_list = self.pdf_search(self.file_path, self.view.get_search_word(), self.view.get_level())
-        if len(self.view.found_list) == 0:
-            self.view.terminal_log.append("search result empty")
-        self.view.search_save_pdf_label.setText(f"{len(self.found_list)} pages ready to merge")
+        found_list = self.pdf_search(file_path, self._view.get_search_word(), self._view.get_level())
+        if len(found_list) == 0:
+            self._view.terminal_log.append("search result empty")
+        self._view.search_save_pdf_label.setText(f"{len(found_list)} pages ready to merge")
     #   
     #
     # returns number of text searchable pages
@@ -78,15 +85,15 @@ class MainController(QObject):
     #
     def check_if_ocr_required(self, is_text_plus_num_pages):
         if is_text_plus_num_pages == 0:
-            self.ocr_file(self.view, self.view.file_path)
-            self.view.search_pdf_button.setEnabled(True)  
+            self.ocr_file(self._view, self._view.file_path)
+            self._view.search_pdf_button.setEnabled(True)  
         else:
             self.page_number_input.setEnabled(True)
-            self.view.search_pdf_button.setEnabled(True)
-            self.view.terminal_log(f"File page count: {is_text_plus_num_pages}")
-            self.view.page_number_input.clear()
-            pages = self.check_pdf(self.view.file_path)
-            self.view.page_count_label.setText(f"Page count: {pages}")
+            self._view.search_pdf_button.setEnabled(True)
+            self._view.terminal_log(f"File page count: {is_text_plus_num_pages}")
+            self._view.page_number_input.clear()
+            pages = self.check_pdf(self._view.file_path)
+            self._view.page_count_label.setText(f"Page count: {pages}")
     #       
     # carry out a levenshtein ratio search on one word
     #
@@ -97,7 +104,7 @@ class MainController(QObject):
             #print(type(l_ratio))
             if l_ratio > float(level):
                 prt_string = f"word matched: {word}"
-                self.view.terminal_log.append(prt_string)
+                self._view.terminal_log.append(prt_string)
                 #print(f"word in: {search_word.lower()} | word found: {word.lower()} | lev ratio: {round(float(l_ratio), 2)}")
                 return l_ratio
     #
@@ -106,20 +113,20 @@ class MainController(QObject):
     # extracted to one file
     #
     def pdf_search(self, file_path, search_word, level):
-        self.view.terminal_log.append(f"pdf search path: {file_path} word: {search_word} level: {level}")
+        self._view.terminal_log.append(f"pdf search path: {file_path} word: {search_word} level: {level}")
         fuzzy_max = 0.0
         fuzzy_total = 0.0
-        self.view.status_bar_label.setText("Searching pdf for matches")
+        self._view.status_bar_label.setText("Searching pdf for matches")
         page_list = []
-        # in self.view if page list is greater than 0 the save button will be enabled
+        # in self._view if page list is greater than 0 the save button will be enabled
         reader = PdfReader(file_path)
         num_pages = len(reader.pages)
         # loop through pages
-        self.view.terminal_log.append(f"start of search for: {search_word} at level {level}")
+        self._view.terminal_log.append(f"start of search for: {search_word} at level {level}")
         for page_num in range(num_pages):
             page = reader.pages[page_num]
             text = page.extract_text()
-            fuzzy_result = self.fuzzy_pdf_search(self.view, text, search_word, level)
+            fuzzy_result = self.fuzzy_pdf_search(self._view, text, search_word, level)
             if fuzzy_result != None:
                 if fuzzy_result > fuzzy_max:
                     fuzzy_max = fuzzy_result
@@ -129,18 +136,18 @@ class MainController(QObject):
             if fuzzy_result > 0:
                 fuzzy_total = fuzzy_total + fuzzy_result
                 page_list.append(page_num)
-                self.view.save_pdf_button.setEnabled(True)
+                self._view.save_pdf_button.setEnabled(True)
             # search text on page and if text found create an array of page numbers
                 # if text.lower().find(search_string.get().lower()) != -1:
                 #     print("text found on page ", page_num)
         print(f"pdf search page list: {page_list}")
-        self.view.search_found_label.setText("No Matches Found")
+        self._view.search_found_label.setText("No Matches Found")
         if len(page_list) > 0:
             fuzzy_average = round(fuzzy_total/len(page_list), 1)
-            self.view.search_found_label.setText(f"Highest match is {str(fuzzy_max)} and average match is {str(fuzzy_average)}")
-            self.view.status_bar_label.setText(f"search matched {len(page_list)}")
+            self._view.search_found_label.setText(f"Highest match is {str(fuzzy_max)} and average match is {str(fuzzy_average)}")
+            self._view.status_bar_label.setText(f"search matched {len(page_list)}")
         else:
-            self.view.status_bar_label.setText("no results found")
+            self._view.status_bar_label.setText("no results found")
         return page_list
 
     #
@@ -152,21 +159,21 @@ class MainController(QObject):
         Adds an OCR text layer to a scanned PDF, making it searchable.
         """
         output_pdf_path = "output/ocr_"+os.path.basename(file_path) 
-        self.view.status_bar_label.setText("ocr pdf")
+        self._view.status_bar_label.setText("ocr pdf")
         ocrmypdf.ocr(file_path, output_pdf_path, skip_text=True, oversample=300, clean=True)
         
         print(f"OCR completed. Searchable PDF saved to: {output_pdf_path}")
-        #self.view.output_label.setText(output_pdf_path)
-        self.view.set_file_path(output_pdf_path)
-        self.view.search_pdf_button.setEnabled(True)
+        #self._view.output_label.setText(output_pdf_path)
+        self._view.set_file_path(output_pdf_path)
+        self._view.search_pdf_button.setEnabled(True)
 
     #
     # todo: option to attach to existing file
     #
     def save_pdf(self, search_string, page_list):
         # all files saved to output
-        file_path = self.view.file_path
-        self.view.status_bar_label.setText("save pdf")
+        file_path = self._view.file_path
+        self._view.status_bar_label.setText("save pdf")
         now = datetime.now()
         print("save pdf", file_path)
         print("page list array", page_list)
@@ -179,14 +186,14 @@ class MainController(QObject):
                 out_path = f"output/{search_string}_{int(now.timestamp())}.pdf"
                 with open(out_path, "wb") as output_pdf:
                     writer.write(output_pdf)
-                self.view.terminal_log.append(f"extracted pdf pages saved: {out_path}")
-                self.view.output_file_label.setText(f"Output Path: {out_path}")
+                self._view.terminal_log.append(f"extracted pdf pages saved: {out_path}")
+                self._view.output_file_label.setText(f"Output Path: {out_path}")
             except Exception as e:
-                self.view.terminal_log.append(f"Error saving file: {e}")
+                self._view.terminal_log.append(f"Error saving file: {e}")
         else:
-            self.view.terminal_log.append("no files in list save_pdf")
+            self._view.terminal_log.append("no files in list save_pdf")
             
-        self.view.save_pdf_button.setEnabled(False)
+        self._view.save_pdf_button.setEnabled(False)
     #
     # extract pages
     #
@@ -210,7 +217,7 @@ class MainController(QObject):
                 with open(output_pdf_path, "wb") as output_file:
                     writer.write(output_file)
                 print(f"Page {ind} extracted and saved as {output_pdf_path}")
-                self.view.terminal_log.append(f"Page {ind} extracted and saved as {output_pdf_path}")
+                self._view.terminal_log.append(f"Page {ind} extracted and saved as {output_pdf_path}")
             return output_pdf_path
 
         except FileNotFoundError:
@@ -224,7 +231,7 @@ class MainController(QObject):
     def merge_pdfs(self, file_name, file_list):
         
         pdf_ext = ".pdf"
-        self.view.status_bar_label.setText("merging pdf")
+        self._view.status_bar_label.setText("merging pdf")
         if pdf_ext.lower() in file_name.lower():
             output_filename = file_name
         else:
@@ -254,23 +261,23 @@ class MainController(QObject):
             except Exception as e:
                 print(f"Error saving file: {e}")
         merger.close()
-        self.view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
+        self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
         
         print(f"PDFs merged successfully into {output_filename}")
     #
     #
     #
-    def pdf_to_image(view, file_path, dpi_in, fmt_in, brightness=0.99):
+    def pdf_to_image(_view, file_path, dpi_in, fmt_in, brightness=0.99):
 
         # Store Pdf with convert_from_path function
-        images = convert_from_path(view, file_path, dpi=dpi_in, fmt=fmt_in)
+        images = convert_from_path(_view, file_path, dpi=dpi_in, fmt=fmt_in)
 
         for i in range(len(images)):
             # Save pages as images in the pdf
             enhancer = ImageEnhance.Brightness(images[i])
             adj_image = enhancer.enhance(brightness) # factor > 1 for brighter, < 1 for darker
             adj_image.save('output/images/page'+str(i)+"."+fmt_in)
-            view.terminal_log.append('saved: output/images/page'+str(i)+"."+fmt_in)
+            _view.terminal_log.append('saved: output/images/page'+str(i)+"."+fmt_in)
         
         print("extracted images", len(images))
         return "output/images", len(images)
