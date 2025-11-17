@@ -107,9 +107,14 @@ class MainWindow(QMainWindow):
 
         self.search_found_label = QLabel("Search Pending")
 
+        
+        
         self.search_pdf_button = QPushButton("fuzzy search")
-        #self.search_pdf_button.clicked.connect(self.search_pdf)
         self.search_pdf_button.setEnabled(False)
+
+        self.ocr_pdf_button = QPushButton("ocr pdf")
+        self.ocr_pdf_button.setEnabled(False)
+        self.ocr_pdf_label = QLabel("OCR Pending")
 
         self.search_save_pdf_label = QLabel("0 pages to merge")
 
@@ -118,11 +123,13 @@ class MainWindow(QMainWindow):
         self.save_pdf_button.clicked.connect(self.save_pdf)
 
         tab_1_left.addWidget(self.open_file_label)
+        tab_1_left.addWidget(self.ocr_pdf_label)
         tab_1_left.addWidget(self.search_pdf_input_word)
         tab_1_left.addWidget(self.search_found_label)
         tab_1_left.addWidget(self.search_save_pdf_label)
 
         tab_1_right.addWidget(self.open_file_button)
+        tab_1_right.addWidget(self.ocr_pdf_button)
         tab_1_right.addWidget(self.search_pdf_combo)
         tab_1_right.addWidget(self.search_pdf_button)
         tab_1_right.addWidget(self.save_pdf_button)
@@ -254,8 +261,6 @@ class MainWindow(QMainWindow):
         tab_5_left.addWidget(self.extract_pdf_to_word_label)
         
         self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
-        # self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
-        # self.extract_pdf_to_word_open_files_button.clicked.connect(self.filedialog.open_file_dialog)
         tab_5_right.addWidget(self.extract_pdf_to_word_open_files_button)
 
         self.extract_pdf_to_word_label = QLabel("Extract")
