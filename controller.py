@@ -32,36 +32,56 @@ class MainController(QObject):
         self.connect_signals()
        
     def connect_signals(self):
-        self._view.open_file_button.clicked.connect(self.open_file_path)
+        self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
         self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
     #
     # open file path and add the path to an instance string
     # 
-    def open_file_path(self):
+    def set_file_path(self):
         #
         file_path = self._fileview.open_file_dialog()
         if file_path:
             self.file_path = file_path
         # update feedback labels
         print("open file path",self.file_path)
-        is_text_searchable = self.check_pdf()
-        print("is text searchable",is_text_searchable)
-        # set labels and buttons
-        if is_text_searchable > 0:
-            self._view.search_pdf_button.setEnabled(True)
-            self._view.search_pdf_combo.setEnabled(True)
-        else:
-            self._view.ocr_pdf_button.setEnabled(True)
-            self._view.search_pdf_button.setEnabled(False)
-            self._view.search_pdf_combo.setEnabled(False)
-        self._view.update_labels("search", file_path)
+        
+    def select_file_paths(self):
+        pass
     #
+    # process based on selected tab
+    #
+    def call_selected_tab(self):
+        
+        print("button validation", self._view.tab_widget.currentIndex())
+       
+        if self._view.tab_widget.currentIndex() == 0:
+            self.set_file_path()
+            is_searchable = self.check_pdf()
+            print("search tab")
+            if is_searchable > 0:
+                self._view.search_pdf_button.setEnabled(True)
+                self._view.search_pdf_combo.setEnabled(True)
+            else:
+                self._view.ocr_pdf_button.setEnabled(True)
+                self._view.search_pdf_button.setEnabled(False)
+                self._view.search_pdf_combo.setEnabled(False)
+            #
+            self._view.update_labels("search", self.file_path)
+        if self._view.tab_widget.currentIndex() == 1:
+            print("tab 2")
+        if self._view.tab_widget.currentIndex() == 2:
+            print("tab 3")
+        if self._view.tab_widget.currentIndex() == 3:
+            print("tab 4")
+        if self._view.tab_widget.currentIndex() == 4:
+            print("tab 5")
+
     #
     #
     def search_pdf(self):
 
-        found_list = self.pdf_search(self.file_path, self._view.get_search_word(), self._view.get_level())
+        found_list = self.process_pdf_file_for_search(self.file_path, self._view.get_search_word(), self._view.get_level())
         if len(found_list) == 0:
             self._view.terminal_log.append("search result empty")
         self._view.search_save_pdf_label.setText(f"{len(found_list)} pages ready to merge")
@@ -101,7 +121,7 @@ class MainController(QObject):
     # found words and page number are added to an array to allow pages to be 
     # extracted to one file
     #
-    def pdf_search(self, file_path, search_word, level):
+    def process_pdf_file_for_search(self, file_path, search_word, level):
         self._view.terminal_log.append(f"pdf search path: {file_path} word: {search_word} level: {level}")
         fuzzy_max = 0.0
         fuzzy_total = 0.0

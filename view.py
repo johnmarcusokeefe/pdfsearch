@@ -97,8 +97,8 @@ class MainWindow(QMainWindow):
         tab_1_widget.setLayout(tab_1_main)
         
         
-        self.open_file_label = QLabel(f"Input path:")
-        self.open_file_button = QPushButton("open file")
+        self.search_open_file_label = QLabel(f"Input path:")
+        self.search_open_file_button = QPushButton("open file")
         
 
         self.search_pdf_input_word = QLineEdit()
@@ -133,13 +133,13 @@ class MainWindow(QMainWindow):
         self.save_pdf_button.setEnabled(False)
         #self.save_pdf_button.clicked.connect(self.save_pdf)
 
-        tab_1_left.addWidget(self.open_file_label)
+        tab_1_left.addWidget(self.search_open_file_label)
         tab_1_left.addWidget(self.ocr_pdf_label)
         tab_1_left.addWidget(self.search_pdf_input_word)
         tab_1_left.addWidget(self.search_found_label)
         tab_1_left.addWidget(self.search_save_pdf_label)
 
-        tab_1_right.addWidget(self.open_file_button)
+        tab_1_right.addWidget(self.search_open_file_button)
         tab_1_right.addWidget(self.ocr_pdf_button)
         tab_1_right.addWidget(self.search_pdf_combo)
         tab_1_right.addWidget(self.search_pdf_button)
@@ -363,6 +363,7 @@ class MainWindow(QMainWindow):
     def tab_changed(self):
         print("new tab selected")
         self.clear_all_values()
+        
 
     def list_select(self):
         print("item selected", self.page_number_input.selectedIndexes())
@@ -376,7 +377,7 @@ class MainWindow(QMainWindow):
         if tab_name == "search":
             # sets search button enabled when file loaded. may not be text
             self.file_name = os.path.basename(file_path)
-            self.open_file_label.setText(f"Input Path: {file_path}")
+            self.search_open_file_label.setText(f"Input Path: {file_path}")
             self.current_directory = os.path.dirname(file_path)
             self.current_directory_label.setText(f"Current directory: {self.current_directory}")
             self.file_size = round(os.path.getsize(file_path)/1024/1024, 1)
@@ -405,22 +406,22 @@ class MainWindow(QMainWindow):
         self.page_number_input.clear()
         #self.filedialog.open_file_dialog()
         # update feedback labels
-        self.update_labels("extract")
+        #self.update_labels("extract")
     # tab 3
     def open_files_to_join_button(self):
         print("open files to join")
         #file_list = self.filedialog.open_multiple_file_dialog()
-        self.file_list_display.addItems(file_list)
+        #self.file_list_display.addItems(file_list)
 
     # tab 4
     def open_file_convert_pdf_to_image(self):
         #file_path = self.filedialog.open_file_dialog()
-        self.extract_pdf_to_images_label.setText(f"Pdf to Image file path: {file_path}")
+        # self.extract_pdf_to_images_label.setText(f"Pdf to Image file path: {file_path}")
         self.extract_pdf_to_images_filetype.setEnabled(True)
-        self.extract_pdf_to_images_quality.setEnabled(True)
-        num_pages = self.ctl.count_pdf_pages(file_path)
-        self.pdf_to_image_page_count_label.setText(f"Pages to convert: {num_pages}")
-        self.terminal_log.setText(f"Filepath: {file_path} loaded with {num_pages} pages")
+        # self.extract_pdf_to_images_quality.setEnabled(True)
+        # num_pages = self.ctl.count_pdf_pages(file_path)
+        # self.pdf_to_image_page_count_label.setText(f"Pages to convert: {num_pages}")
+        # self.terminal_log.setText(f"Filepath: {file_path} loaded with {num_pages} pages")
         #self.extract_pdf_to_images_button.setText(f"Pages to convert: {num_pages}")
    
     # tab 5
@@ -452,7 +453,6 @@ class MainWindow(QMainWindow):
     # --------------------#
     def clear_all_values(self):
         self.file_path = ""
-        self.file_open_label.setText(f"Input path:")
         self.search_found_label.setText("Search Pending")
         self.search_save_pdf_label.setText(" 0pages ready to merge")
         self.output_file_label.setText("Output path:")
