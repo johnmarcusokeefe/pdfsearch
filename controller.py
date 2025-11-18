@@ -11,10 +11,9 @@ import ocrmypdf
 from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
-
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Signal, QObject
-
+# my files
 from view import MainWindow
 from fileview import FileDialogue
 #
@@ -35,6 +34,7 @@ class MainController(QObject):
     def connect_signals(self):
         self._view.open_file_button.clicked.connect(self.open_file_path)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
+        self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
         # self._view.save_pdf_button.clicked.connect(lambda: self.save_pdf(self._view.get_search_word(), self._view.found_list))
         # self._view.extract_pdf_button.clicked.connect(lambda: self.extract_pdfs(self._view.file_path, self._view.found_list))
         # self._view.merge_pdf_button.clicked.connect(lambda: self.merge_pdfs(self._view.get_merge_file_name(), self._view.get_merge_file_list()))
@@ -45,21 +45,27 @@ class MainController(QObject):
     def open_file_path(self):
         #
         file_path = self._fileview.open_file_dialog()
+        if file_path:
+            self.file_path = file_path
         # update feedback labels
         print("open file path",file_path)
         is_text_searchable = self.check_pdf(file_path)
         print("is text searchable",is_text_searchable)
+        # button
         if is_text_searchable > 0:
             self._view.search_pdf_button.setEnabled(True)
+            self._view.search_pdf_combo.setEnabled(True)
         else:
-            self.check_if_ocr_required(file_path, is_text_searchable)
+            self._view.ocr_pdf_button.setEnabled(True)
+            self._view.search_pdf_button.setEnabled(False)
+            self._view.search_pdf_combo.setEnabled(False)
         self._view.update_labels("search", file_path)
     #
     #
     #
-    def search_pdf(self, file_path):
+    def search_pdf(self):
 
-        found_list = self.pdf_search(file_path, self._view.get_search_word(), self._view.get_level())
+        found_list = self.pdf_search(self.file_path, self._view.get_search_word(), self._view.get_level())
         if len(found_list) == 0:
             self._view.terminal_log.append("search result empty")
         self._view.search_save_pdf_label.setText(f"{len(found_list)} pages ready to merge")
@@ -95,7 +101,7 @@ class MainController(QObject):
             pages = self.check_pdf(self._view.file_path)
             self._view.page_count_label.setText(f"Page count: {pages}")
     #       
-    # carry out a levenshtein ratio search on one word
+    # subfunction of pdf_search. searches one string
     #
     def fuzzy_pdf_search(self, text, search_word, level):
         l_ratio = 0
@@ -126,7 +132,7 @@ class MainController(QObject):
         for page_num in range(num_pages):
             page = reader.pages[page_num]
             text = page.extract_text()
-            fuzzy_result = self.fuzzy_pdf_search(self._view, text, search_word, level)
+            fuzzy_result = self.fuzzy_pdf_search(text, search_word, level)
             if fuzzy_result != None:
                 if fuzzy_result > fuzzy_max:
                     fuzzy_max = fuzzy_result
@@ -149,35 +155,33 @@ class MainController(QObject):
         else:
             self._view.status_bar_label.setText("no results found")
         return page_list
-
     #
     # create a text searchable document
     #
-    def ocr_file(self, file_path):
-    
+    def ocr_file(self):
         """
         Adds an OCR text layer to a scanned PDF, making it searchable.
         """
-        output_pdf_path = "output/ocr_"+os.path.basename(file_path) 
+        output_pdf_path = "output/ocr_"+os.path.basename(self.file_path) 
         self._view.status_bar_label.setText("ocr pdf")
-        ocrmypdf.ocr(file_path, output_pdf_path, skip_text=True, oversample=300, clean=True)
-        
+        ocrmypdf.ocr(self.file_path, output_pdf_path, skip_text=True, oversample=300, clean=True)
         print(f"OCR completed. Searchable PDF saved to: {output_pdf_path}")
-        #self._view.output_label.setText(output_pdf_path)
-        self._view.set_file_path(output_pdf_path)
+        # sets the search path
+        self.file_path = output_pdf_path
+        self._view.open_file_label.setText(self.file_path)
         self._view.search_pdf_button.setEnabled(True)
+        self._view.search_pdf_combo.setEnabled(True)
 
     #
     # todo: option to attach to existing file
     #
     def save_pdf(self, search_string, page_list):
         # all files saved to output
-        file_path = self._view.file_path
         self._view.status_bar_label.setText("save pdf")
         now = datetime.now()
-        print("save pdf", file_path)
+        print("save pdf", self.file_path)
         print("page list array", page_list)
-        reader = PdfReader(file_path)
+        reader = PdfReader(self.file_path)
         if len(page_list) > 0:
             writer = PdfWriter()
             for page in page_list:

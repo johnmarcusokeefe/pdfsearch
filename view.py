@@ -4,8 +4,11 @@ from PySide6.QtWidgets import (
     QLabel, QListWidget, QDialog, QCheckBox, QTabWidget, QLineEdit, QComboBox,
     QAbstractItemView, QTextEdit
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QRegularExpression
 import os, subprocess
+
+from PySide6.QtGui import QRegularExpressionValidator
+
 
 class FeedbackWindow(QDialog):
 
@@ -98,16 +101,24 @@ class MainWindow(QMainWindow):
         self.open_file_button = QPushButton("open file")
         
 
-        # Create widgets tab1
         self.search_pdf_input_word = QLineEdit()
-        self.search_pdf_input_word.setPlaceholderText("Open File to search")
+        self.search_pdf_input_word.setPlaceholderText("enter single word without spaces")
+        
+          # Create a QRegExp that matches any character except a space
+        # The '+' means one or more occurrences of the allowed characters
+        regex = QRegularExpression("[^ ]+") 
+        
+        # Create a QRegExpValidator with the defined regex
+        validator = QRegularExpressionValidator(regex)
+        
+        # Set the validator on the QLineEdit
+        self.search_pdf_input_word.setValidator(validator)
 
         self.search_pdf_combo = QComboBox()
         self.search_pdf_combo.addItems(["0.9","0.8","0.7","0.6","0.5","0.4","0.3","0.2","0.1"])
-
+        self.search_pdf_combo.setEnabled(False)
         self.search_found_label = QLabel("Search Pending")
 
-        
         
         self.search_pdf_button = QPushButton("fuzzy search")
         self.search_pdf_button.setEnabled(False)
@@ -120,7 +131,7 @@ class MainWindow(QMainWindow):
 
         self.save_pdf_button = QPushButton("save")
         self.save_pdf_button.setEnabled(False)
-        self.save_pdf_button.clicked.connect(self.save_pdf)
+        #self.save_pdf_button.clicked.connect(self.save_pdf)
 
         tab_1_left.addWidget(self.open_file_label)
         tab_1_left.addWidget(self.ocr_pdf_label)
