@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (
     QFileDialog
 )
 import time
+from view import MainWindow
 
 #
     # open file only. open files can be searched or converted so needs to be focused
@@ -23,44 +24,22 @@ class FileDialogue:
             "output",      # Initial directory (can be an empty string for default)
             "PDF Files (*.pdf);;All Files (*.*)" # File filters
         )
+        print("open file dialog", file_path)
         return file_path
 
        
 
     
-    def open_multiple_file_dialog(self):
+    def open_multiple_files_dialog(self):
         file_list = []
-        file_paths, _ = QFileDialog.getOpenFileNames(
+        file_list, _ = QFileDialog.getOpenFileNames(
             None,
             "Select Multiple Files",
             "",  # Current working directory
             "PDF Files (*.pdf);;JPEG Files (*.jpg);;PNG Files (*.png);;All Files (*.*)"
         )
         # 
-        if len(file_paths) > 1:
-            #self.status_bar_label.setText(f"files selected")    
-            #print("Selected files:")
-            self.join_pdf_save_file_button.setEnabled(True)
-            for path in file_paths:
-                file_list.append(path)
-            #
-            # file dialog box that displays selected file paths for feedback
-            #
-            self.dialog = FeedbackWindow(self.file_list, self) # Pass self as parent for WindowModal
-            if self.dialog.exec() == 1: # Shows the dialog modally
-                self.terminal_log.append(f"multiple files selected")
-                i = 1
-                for file in file_list:
-                    self.terminal_log.append(f"{i}: {os.path.basename(file)}")
-                    i = i + 1
-                # tab 3 join pdf    
-                self.join_pdf_select_multiple_files.setText(f"File Selected Count: {len(self.file_list)}")
-                
-            else:
-                self.terminal_log.append("File Operation Cancelled")
-        else:
-            self.status_bar_label.setText("files not selected")
-
+        print("open multiple files", file_list )
         return file_list
     
      #

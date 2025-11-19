@@ -12,17 +12,18 @@ from PySide6.QtGui import QRegularExpressionValidator
 
 class FeedbackWindow(QDialog):
 
-   def __init__(self):
+   def __init__(self, file_list):
+        self.file_list = file_list
+        super().__init__()
 
         self.setWindowTitle("Feedback Window")
         layout = QVBoxLayout(self)
-        file_list = []
 
         label = QLabel("Files Selected:")
         self.list_widget = QListWidget()
         i = 0
         
-        for line in file_list:
+        for line in self.file_list:
             self.list_widget.addItem(str(os.path.basename(line)))
             i = i + 1
 
@@ -38,6 +39,7 @@ class FeedbackWindow(QDialog):
         layout.addWidget(cancel_button)
         self.setLayout(layout)
         
+
 class MainWindow(QMainWindow):
 
     def __init__(self):
@@ -193,7 +195,7 @@ class MainWindow(QMainWindow):
 
         join_pdf_label = QLabel("Join\\Combine Selected Files:\nChoose: PDF, PNG or PDF")
         self.join_pdf_select_multiple_files = QPushButton("Open Files")
-        self.join_pdf_select_multiple_files.clicked.connect(self.open_files_to_join_button)
+        #self.join_pdf_select_multiple_files.clicked.connect(self.open_files_to_join_button)
 
         self.auto_filename = QCheckBox("Auto Filename")
         self.auto_filename.setChecked(False)

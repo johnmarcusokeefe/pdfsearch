@@ -14,7 +14,8 @@ from pdf2docx import Converter
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Signal, QObject
 # my files
-from view import MainWindow
+from view import MainWindow, FeedbackWindow
+
 from fileview import FileDialogue
 #
 # Subclass QMainWindow to customize your application's main window
@@ -27,14 +28,18 @@ class MainController(QObject):
         self._view = view
         self._fileview = fileview 
         self.file_path = ""
-        self.found_list = []
+        self.file_list = []
         # connect signals and slots
         self.connect_signals()
        
     def connect_signals(self):
+        #tab1
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
         self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
+        # tab2
+        # tab3
+        self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
     #
     # open file path and add the path to an instance string
     # 
@@ -45,9 +50,40 @@ class MainController(QObject):
             self.file_path = file_path
         # update feedback labels
         print("open file path",self.file_path)
+   
+   
+    # use a feedback window to confirm files added
+    def set_multiple_file_paths(self):
+
+        file_list_in = []
+        files = self._fileview.open_multiple_files_dialog()
+        if len(files) > 1:
+            #self.status_bar_label.setText(f"files selected")    
+            #print("Selected files:")
+            self._view.join_pdf_save_file_button.setEnabled(True)
+            for path in files:
+                file_list_in.append(path)
+            #
+            # file dialog box that displays selected file paths for feedback
+            #
+            self.dialog = FeedbackWindow(file_list_in) # Pass self as parent for WindowModal
+            if self.dialog.exec() == 1: # Shows the dialog modally
+                self._view.terminal_log.append(f"multiple files selected")
+                i = 1
+                for file in file_list_in:
+                    self._view.file_list_display.addItem(f"{i}: {os.path.basename(file)}")
+                    i = i + 1
+                # tab 3 join pdf    
+                self._view.join_pdf_select_multiple_files.setText(f"File Selected Count: {len(file_list_in)}")
+                # set file list values
+                self.file_list = file_list_in
+            else:
+                self._view.terminal_log.append("File Operation Cancelled")
+        else:
+            self._view.status_bar_label.setText("files not selected")
         
-    def select_file_paths(self):
-        pass
+
+   
     #
     # process based on selected tab
     #
