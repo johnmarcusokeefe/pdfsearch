@@ -161,19 +161,19 @@ class MainWindow(QMainWindow):
         tab2_main.addLayout(tab2_right)
         tab2_content.setLayout(tab2_main)
 
-        self.page_number_input = QListWidget()
-        self.page_number_input.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.page_number_input.setEnabled(False)
-        self.page_number_input.itemSelectionChanged.connect(self.list_select)
+        self.select_page_list = QListWidget()
+        self.select_page_list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.select_page_list.setEnabled(False)
+        self.select_page_list.itemSelectionChanged.connect(self.list_select)
         
         self.extract_pages_file_open_button = QPushButton("Open File")
-        self.extract_pages_file_open_button.clicked.connect(self.open_path_to_extract_pages_button)
+        #self.extract_pages_file_open_button.clicked.connect(self.open_path_to_extract_pages_button)
         
         self.split_pdf_save_file_button = QPushButton("Extract")
         self.split_pdf_save_file_button.setEnabled(False)
-        self.split_pdf_save_file_button.clicked.connect(self.extract_pages)
+        #self.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         
-        tab2_left.addWidget(self.page_number_input)
+        tab2_left.addWidget(self.select_page_list)
         tab2_right.addWidget(self.extract_pages_file_open_button, alignment=Qt.AlignTop)
         tab2_right.addWidget(self.split_pdf_save_file_button, alignment=Qt.AlignTop)
 
@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
 
         # Add tabs to main tab widget
         self.tab_widget.addTab(tab_1_widget, "Search PDF")
-        self.tab_widget.addTab(tab2_content, "Extract PDF")
+        self.tab_widget.addTab(tab2_content, "Extract PDF Pages")
         self.tab_widget.addTab(tab3_content, "Join Files")
         self.tab_widget.addTab(tab4_content, "File Conversions")
         self.tab_widget.addTab(tab_5_content, "PDF to Text")
@@ -318,14 +318,16 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     #
-    # --- Rest of your class methods unchanged ---
+    # tab 2
     #
     def check_extract_selection_enabled(self):
-        selected_items = self.page_number_input.selectedItems()
+        selected_items = self.select_page_list.selectedItems()
         if len(selected_items) > 0:
             self.split_pdf_save_file_button.setEnabled(True)
         else:
             self.split_pdf_save_file_button.setEnabled(False)
+    #
+    # toggle log window open/closed
     #
     def open_log_window(self):
         self.display_sizes()
@@ -336,41 +338,17 @@ class MainWindow(QMainWindow):
         else:
             self.setFixedHeight(self.height()+314)
             self.terminal_log.show()
-    #
-    def open_finder_window(self):
-        path = "output"
-        """
-        Opens a Finder window to the specified path on macOS.
-        Args:
-        path (str): The path to the directory or file to open in Finder.
-        """
-        try:
-            subprocess.run(["open", path], check=True)
-            print(f"Finder window opened to: {path}")
-        except subprocess.CalledProcessError as e:
-            print(f"Error opening Finder window: {e}")
-        except FileNotFoundError:
-            print("The 'open' command was not found. This script is intended for macOS.")
-
-        # Example usage:
-        # Open the current working directory in Finder
-        #open_finder_window(".")
-
-        # Open a specific directory
-        # open_finder_window("/Users/yourusername/Documents")
-
-        # Open a specific file and reveal it in Finder
-        # open_finder_window("/Users/yourusername/Documents/my_document.txt")
+    
     # 
     def tab_changed(self):
         print("new tab selected")
         self.clear_all_values()
         
-
+    # tab 2
     def list_select(self):
-        print("item selected", self.page_number_input.selectedIndexes())
+        print("item selected", self.select_page_list.selectedIndexes())
         self.terminal_log.append("new selection")
-        for i in self.page_number_input.selectedIndexes():
+        for i in self.select_page_list.selectedIndexes():
             print("index:" , i.row())
             self.terminal_log.append(f"selected: {i.row()}")
     
@@ -388,33 +366,8 @@ class MainWindow(QMainWindow):
             # if pages found returns a count otherwise 0v
             #self.page_count = self.is_text_plus_num_pages
             self.terminal_log.append(f"Selected file: {file_path}")
-
-        if tab_name == "extract":
-            self.split_pdf_save_file_button.setEnabled(True)
-            page_count = self.count_pdf_pages(self, self.file_path)
-            print("extract pages", page_count)
-            # loads list of files
-            if page_count > 0:
-                for page in range(page_count):
-                    self.page_number_input.addItem(str(page))
-                self.page_number_input.setEnabled(True)
-            else:
-                self.status_bar_label.setText("file selection requires more than one page")
-                self.split_pdf_save_file_button.setEnabled(False)
+    #
     
-   
-    # tab 2
-    def open_path_to_extract_pages_button(self):
-        self.page_number_input.clear()
-        #self.filedialog.open_file_dialog()
-        # update feedback labels
-        #self.update_labels("extract")
-    # tab 3
-    def open_files_to_join_button(self):
-        print("open files to join")
-        #file_list = self.filedialog.open_multiple_file_dialog()
-        #self.file_list_display.addItems(file_list)
-
     # tab 4
     def open_file_convert_pdf_to_image(self):
         #file_path = self.filedialog.open_file_dialog()
@@ -460,7 +413,7 @@ class MainWindow(QMainWindow):
         self.output_file_label.setText("Output path:")
         self.status_bar_label.setText("")
         self.extract_pdf_to_images_label.setText("Input path:")
-        self.page_number_input.clear()
+        self.select_page_list.clear()
         self.extract_pdf_to_images_filetype.setCurrentIndex(0)
         self.extract_pdf_to_images_quality.setCurrentIndex(0)
         self.extract_pdf_to_images_button.setEnabled(False)
@@ -470,19 +423,7 @@ class MainWindow(QMainWindow):
     def display_sizes(self):
         print("height", self.__class__ , self.height())
 
-    def extract_pages(self):
-        page_list = []
-        #print(f"Selected Pages: {self.page_number_input.selectedIndexes()}")
-        selection_model = self.page_number_input.selectionModel()
-        # Get the selected indexes
-        selected_indexes = selection_model.selectedIndexes()
-    
-        for index in selected_indexes:
-            print("index appended ", index.row())
-            page_list.append(index.row())
-            print(f"Row: {index.row()}, Column: {index.column()}, Data: {index.data()}")
-        # call extract and set output path
-        self.output_file_label.setText(f"output path: {os.path.dirname(self.ctr.extract_pdfs(self.file_path, page_list))}")
+
     #
     def get_output_filename_flag(self):
         if self.auto_filename.isChecked():
@@ -520,4 +461,28 @@ class MainWindow(QMainWindow):
         self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
 
 
-  
+  #
+    def open_finder_window(self):
+        path = "output"
+        """
+        Opens a Finder window to the specified path on macOS.
+        Args:
+        path (str): The path to the directory or file to open in Finder.
+        """
+        try:
+            subprocess.run(["open", path], check=True)
+            print(f"Finder window opened to: {path}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error opening Finder window: {e}")
+        except FileNotFoundError:
+            print("The 'open' command was not found. This script is intended for macOS.")
+
+        # Example usage:
+        # Open the current working directory in Finder
+        #open_finder_window(".")
+
+        # Open a specific directory
+        # open_finder_window("/Users/yourusername/Documents")
+
+        # Open a specific file and reveal it in Finder
+        # open_finder_window("/Users/yourusername/Documents/my_document.txt")

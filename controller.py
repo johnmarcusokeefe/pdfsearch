@@ -38,6 +38,8 @@ class MainController(QObject):
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
         self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
         # tab2
+        self._view.extract_pages_file_open_button.clicked.connect(self.call_selected_tab)
+        self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         # tab3
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
     #
@@ -82,8 +84,6 @@ class MainController(QObject):
         else:
             self._view.status_bar_label.setText("files not selected")
         
-
-   
     #
     # process based on selected tab
     #
@@ -104,7 +104,10 @@ class MainController(QObject):
                 self._view.search_pdf_combo.setEnabled(False)
             #
             self._view.update_labels("search", self.file_path)
+        # tab 2 selected
         if self._view.tab_widget.currentIndex() == 1:
+            self.set_file_path()
+            self.add_pages_to_list_view()
             print("tab 2")
         if self._view.tab_widget.currentIndex() == 2:
             print("tab 3")
@@ -112,7 +115,33 @@ class MainController(QObject):
             print("tab 4")
         if self._view.tab_widget.currentIndex() == 4:
             print("tab 5")
-
+    #
+    def add_pages_to_list_view(self):
+        self._view.split_pdf_save_file_button.setEnabled(True)
+        page_count = self.check_pdf()
+        print("extract pages", page_count)
+        # loads list of files
+        if page_count > 0:
+            for page in range(page_count):
+                self._view.select_page_list.addItem(str(page))
+            self._view.select_page_list.setEnabled(True)
+        else:
+            self.status_bar_label.setText("file selection requires more than one page")
+            self.split_pdf_save_file_button.setEnabled(False)
+    #
+    def extract_pages(self):
+        page_list = []
+        #print(f"Selected Pages: {self.page_number_input.selectedIndexes()}")
+        selection_model = self._view.select_page_list.selectionModel()
+        # Get the selected indexes
+        selected_indexes = selection_model.selectedIndexes()
+    
+        for index in selected_indexes:
+            print("index appended ", index.row())
+            page_list.append(index.row())
+            print(f"Row: {index.row()}, Column: {index.column()}, Data: {index.data()}")
+        # call extract and set output path
+        self._view.output_file_label.setText(f"output path: {os.path.dirname(self.extract_pdfs(page_list))}")    
     #
     #
     def search_pdf(self):
@@ -214,16 +243,16 @@ class MainController(QObject):
     #
     # extract pages
     #
-    def extract_pdfs(self, file_path, page_list):
+    def extract_pdfs(self, page_list):
         # Open the original PDF file
-        output_dir = os.path.dirname(file_path)
-        extract_to_dir = "/"+os.path.basename(file_path).rsplit('.', 1)[0]
+        output_dir = os.path.dirname(self.file_path)
+        extract_to_dir = "/"+os.path.basename(self.file_path).rsplit('.', 1)[0]
         # Create the directory if it doesn't exist
         if not os.path.exists(output_dir+extract_to_dir):
             os.makedirs(output_dir+extract_to_dir) # os.makedirs creates intermediate directories too
         print("extract", output_dir)
         try:
-            reader = PdfReader(file_path)
+            reader = PdfReader(self.file_path)
             num_pages = len(page_list) 
             for i in range(num_pages):
                 writer = PdfWriter()
@@ -238,7 +267,7 @@ class MainController(QObject):
             return output_pdf_path
 
         except FileNotFoundError:
-            print(f"Error: The file '{file_path}' was not found.")
+            print(f"Error: The file '{self.file_path}' was not found.")
         except Exception as e:
             print(f"An error occurred: {e}")     
     #
