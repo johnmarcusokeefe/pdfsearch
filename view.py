@@ -432,7 +432,7 @@ class MainWindow(QMainWindow):
             return False
     
     def save_file_list(self):
-        #file_name = self.filedialog.save_file_dialog()
+        file_name = self.filedialog.save_file_dialog()
         self.ctl.merge_pdfs(self.ctl, self, file_name)
     
     def get_level(self):
