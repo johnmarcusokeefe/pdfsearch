@@ -14,6 +14,6 @@ __pycache__/
 # Other common ignore patterns
 .DS_Store
 ._*
-pdfsearch
-output
-test_data
+pdfsearch/
+output/
+test_data/
