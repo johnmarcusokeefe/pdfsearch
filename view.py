@@ -98,11 +98,9 @@ class MainWindow(QMainWindow):
         tab_1_main.addLayout(tab_1_right)
         tab_1_widget.setLayout(tab_1_main)
         
-        
         self.search_open_file_label = QLabel(f"Input path:")
         self.search_open_file_button = QPushButton("open file")
         
-
         self.search_pdf_input_word = QLineEdit()
         self.search_pdf_input_word.setPlaceholderText("enter single word without spaces")
         
@@ -351,7 +349,7 @@ class MainWindow(QMainWindow):
         for i in self.select_page_list.selectedIndexes():
             print("index:" , i.row())
             self.terminal_log.append(f"selected: {i.row()}")
-    
+    #
     def update_labels(self, tab_name, file_path):
         
         if tab_name == "search":
@@ -367,7 +365,6 @@ class MainWindow(QMainWindow):
             #self.page_count = self.is_text_plus_num_pages
             self.terminal_log.append(f"Selected file: {file_path}")
     #
-    
     # tab 4
     def open_file_convert_pdf_to_image(self):
         #file_path = self.filedialog.open_file_dialog()
@@ -399,9 +396,7 @@ class MainWindow(QMainWindow):
    
     # 
     #
-    def save_pdf(self, file_list):
-        
-        self.ctr.save_pdf(self, self.get_search_word(), self.found_list)
+    
 
     # ------------------- #
     #  reset all values    #
@@ -430,10 +425,10 @@ class MainWindow(QMainWindow):
             return True
         else:
             return False
-    
+    #
     def save_file_list(self):
         file_name = self.filedialog.save_file_dialog()
-        self.ctl.merge_pdfs(self.ctl, self, file_name)
+        self.ctl.merge_pdfs(file_name)
     
     def get_level(self):
         return self.search_pdf_combo.currentText()
@@ -460,8 +455,8 @@ class MainWindow(QMainWindow):
         out_path, count = self.ctr.pdf_to_image(self, dpi, file_t)
         self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
 
-
-  #
+    #
+    #
     def open_finder_window(self):
         path = "output"
         """

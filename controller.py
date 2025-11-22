@@ -37,6 +37,7 @@ class MainController(QObject):
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
         self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
+        self._view.save_pdf_button.clicked.connect(self.save_pdf)
         # tab2
         self._view.extract_pages_file_open_button.clicked.connect(self.call_selected_tab)
         self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
@@ -90,7 +91,6 @@ class MainController(QObject):
     def call_selected_tab(self):
         
         print("button validation", self._view.tab_widget.currentIndex())
-       
         if self._view.tab_widget.currentIndex() == 0:
             self.set_file_path()
             is_searchable = self.check_pdf()
@@ -135,7 +135,6 @@ class MainController(QObject):
         selection_model = self._view.select_page_list.selectionModel()
         # Get the selected indexes
         selected_indexes = selection_model.selectedIndexes()
-    
         for index in selected_indexes:
             print("index appended ", index.row())
             page_list.append(index.row())
@@ -145,13 +144,11 @@ class MainController(QObject):
     #
     #
     def search_pdf(self):
-
-        found_list = self.process_pdf_file_for_search(self.file_path, self._view.get_search_word(), self._view.get_level())
-        if len(found_list) == 0:
+        self.file_list = self.process_pdf_file_for_search(self.file_path, self._view.get_search_word(), self._view.get_level())
+        if len(self.file_list) == 0:
             self._view.terminal_log.append("search result empty")
-        self._view.search_save_pdf_label.setText(f"{len(found_list)} pages ready to merge")
+        self._view.search_save_pdf_label.setText(f"{len(self.file_list)} pages ready to merge")
     #   
-    #
     # returns number of text searchable pages
     #
     def check_pdf(self):   
@@ -237,7 +234,7 @@ class MainController(QObject):
         print(f"OCR completed. Searchable PDF saved to: {output_pdf_path}")
         # sets the search path
         self.file_path = output_pdf_path
-        self._view.open_file_label.setText(self.file_path)
+        self._view.search_open_file_label.setText(self.file_path)
         self._view.search_pdf_button.setEnabled(True)
         self._view.search_pdf_combo.setEnabled(True)
     #
@@ -366,11 +363,14 @@ class MainController(QObject):
             print(f"Successfully converted '{file_path}' to '{docx_file_path}'")
         except Exception as e:
             print(f"Error converting PDF to Word: {e}")
+    
     #
     # save pdf from a list of pages
     #
-    def save_pdf(self, search_string, page_list):
+    def save_pdf(self):
         # all files saved to output
+        page_list = self.file_list
+        search_string = self._view.search_pdf_input_word.text()
         self._view.status_bar_label.setText("save pdf")
         now = datetime.now()
         print("save pdf", self.file_path)
