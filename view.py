@@ -199,7 +199,7 @@ class MainWindow(QMainWindow):
         self.auto_filename.setChecked(False)
         self.join_pdf_save_file_button = QPushButton("Save")
         self.join_pdf_save_file_button.setEnabled(False)
-        self.join_pdf_save_file_button.clicked.connect(self.save_file_list)
+        #self.join_pdf_save_file_button.clicked.connect(self.save_file_list)
 
         tab3_left.addWidget(self.file_list_display)
         tab3_right.addWidget(join_pdf_label)
@@ -393,11 +393,7 @@ class MainWindow(QMainWindow):
         if self.file_path == "":
             self.extract_pdf_to_images_button.setEnabled(False)
 
-   
-    # 
-    #
     
-
     # ------------------- #
     #  reset all values    #
     # --------------------#
@@ -412,23 +408,16 @@ class MainWindow(QMainWindow):
         self.extract_pdf_to_images_filetype.setCurrentIndex(0)
         self.extract_pdf_to_images_quality.setCurrentIndex(0)
         self.extract_pdf_to_images_button.setEnabled(False)
-    #
-    #
-    #
-    def display_sizes(self):
-        print("height", self.__class__ , self.height())
 
-
+    #
+    #
     #
     def get_output_filename_flag(self):
         if self.auto_filename.isChecked():
             return True
         else:
             return False
-    #
-    def save_file_list(self):
-        file_name = self.filedialog.save_file_dialog()
-        self.ctl.merge_pdfs(file_name)
+  
     
     def get_level(self):
         return self.search_pdf_combo.currentText()

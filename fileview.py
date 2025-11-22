@@ -45,10 +45,10 @@ class FileDialogue:
      #
     # cut and paste example to be adapted
     #
-    def save_file_dialog(self):
+    def user_filename_input_dialog(self, flag):
         # Open a QFileDialog for saving a file
         current_timestamp = time.time()
-        if self.get_output_filename_flag() == True:
+        if flag == True:
             filename = f"output/merge_{len(self.file_list)}_pages_{current_timestamp}.pdf"
         else:
             filename, _ = QFileDialog.getSaveFileName(

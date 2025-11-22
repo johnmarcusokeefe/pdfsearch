@@ -43,6 +43,8 @@ class MainController(QObject):
         self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         # tab3
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
+        self._view.join_pdf_save_file_button.clicked.connect( self._fileview.user_filename_input_dialog)
+        # tab4
     #
     # open file path and add the path to an instance string
     # 
@@ -110,6 +112,10 @@ class MainController(QObject):
             self.add_pages_to_list_view()
             print("tab 2")
         if self._view.tab_widget.currentIndex() == 2:
+            self.set_multiple_file_paths()
+            if len(self.file_list) > 0:
+                self.merge_pdfs()
+
             print("tab 3")
         if self._view.tab_widget.currentIndex() == 3:
             print("tab 4")
@@ -270,10 +276,17 @@ class MainController(QObject):
     #
     # merge pdfs
     #
-    def merge_pdfs(self, file_name, file_list):
+    def merge_pdfs(self):
         
         pdf_ext = ".pdf"
+        file_list = self.file_list
+        if self._view.get_output_filename_flag == True:
+            file_name = "create_filename"
+        else:
+            self.set_file_path()
+
         self._view.status_bar_label.setText("merging pdf")
+        # test if has pdf extension
         if pdf_ext.lower() in file_name.lower():
             output_filename = file_name
         else:
