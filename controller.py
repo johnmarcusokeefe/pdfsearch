@@ -45,16 +45,48 @@ class MainController(QObject):
         self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         # tab3
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
-        self._view.join_pdf_save_file_button.clicked.connect(self.append_pdf_files)
+        self._view.join_pdf_save_file_button.clicked.connect(self.merge_pdfs)
         # tab4
     #
-    def append_pdf_files(self):
-        file_path = self._fileview.user_filename_input_dialog(self._view.get_output_filename_flag)
-        if file_path:
-            self.file_path = file_path
-            self.merge_pdfs()
-        else:
-            print("file not saved")
+        #
+    # process based on selected tab
+    #
+    def call_selected_tab(self):
+        
+        print("button validation", self._view.tab_widget.currentIndex())
+        if self._view.tab_widget.currentIndex() == 0:
+            self.set_file_path()
+            is_searchable = self.check_pdf()
+            print("search tab")
+            if is_searchable > 0:
+                self._view.search_pdf_button.setEnabled(True)
+                self._view.search_pdf_combo.setEnabled(True)
+            else:
+                self._view.ocr_pdf_button.setEnabled(True)
+                self._view.search_pdf_button.setEnabled(False)
+                self._view.search_pdf_combo.setEnabled(False)
+            #
+            self._view.update_labels("search", self.file_path)
+        # tab 2 selected
+        if self._view.tab_widget.currentIndex() == 1:
+            self.set_file_path()
+            self.add_pages_to_list_view()
+            print("tab 2")
+        # tab 3
+        if self._view.tab_widget.currentIndex() == 2:
+            flag = self._view.get_output_filename_flag()
+            file_name = self._fileview.user_filename_input_dialog(flag)
+            if file_name != "":
+                self.merge_pdfs
+            else:
+                print("no filename provided")
+            print("tab 3")
+        # tab 4
+        if self._view.tab_widget.currentIndex() == 3:
+            print("tab 4")
+        if self._view.tab_widget.currentIndex() == 4:
+            print("tab 5")
+
        
     # open file path and add the path to an instance string
     # 
@@ -97,40 +129,7 @@ class MainController(QObject):
         else:
             self._view.status_bar_label.setText("files not selected")
         
-    #
-    # process based on selected tab
-    #
-    def call_selected_tab(self):
-        
-        print("button validation", self._view.tab_widget.currentIndex())
-        if self._view.tab_widget.currentIndex() == 0:
-            self.set_file_path()
-            is_searchable = self.check_pdf()
-            print("search tab")
-            if is_searchable > 0:
-                self._view.search_pdf_button.setEnabled(True)
-                self._view.search_pdf_combo.setEnabled(True)
-            else:
-                self._view.ocr_pdf_button.setEnabled(True)
-                self._view.search_pdf_button.setEnabled(False)
-                self._view.search_pdf_combo.setEnabled(False)
-            #
-            self._view.update_labels("search", self.file_path)
-        # tab 2 selected
-        if self._view.tab_widget.currentIndex() == 1:
-            self.set_file_path()
-            self.add_pages_to_list_view()
-            print("tab 2")
-        if self._view.tab_widget.currentIndex() == 2:
-            self.set_multiple_file_paths()
-            if len(self.file_list) > 0:
-                self.merge_pdfs()
 
-            print("tab 3")
-        if self._view.tab_widget.currentIndex() == 3:
-            print("tab 4")
-        if self._view.tab_widget.currentIndex() == 4:
-            print("tab 5")
     #
     def add_pages_to_list_view(self):
         self._view.split_pdf_save_file_button.setEnabled(True)
@@ -290,11 +289,8 @@ class MainController(QObject):
         
         pdf_ext = ".pdf"
         file_list = self.file_list
-        if self._view.get_output_filename_flag == True:
-            file_name = "create_filename"
-        else:
-            self.set_file_path()
-
+       
+        
         self._view.status_bar_label.setText("merging pdf")
         # test if has pdf extension
         if pdf_ext.lower() in file_name.lower():
@@ -304,7 +300,6 @@ class MainController(QObject):
         print("call merge pdfs")
         """
         Merges a list of PDF files into a single output PDF.
-
         """
         merger = PdfWriter()
         for path in file_list:
@@ -326,6 +321,8 @@ class MainController(QObject):
         merger.close()
         self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
         print(f"PDFs merged successfully into {output_filename}")
+    
+
     #
     # pdf to image converter
     #

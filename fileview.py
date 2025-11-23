@@ -42,14 +42,14 @@ class FileDialogue:
         print("open multiple files", file_list )
         return file_list
     
-     #
-    # cut and paste example to be adapted
     #
+    # cut and paste example to be adapted
+    # todo: separate the get name from the createfilename. create filename in control
     def user_filename_input_dialog(self, flag):
         # Open a QFileDialog for saving a file
 
         current_timestamp = time.time()
-        if flag == True:
+        if flag == 1:
             filename = f"output/merge_{len(self.file_list)}_pages_{current_timestamp}.pdf"
         else:
             filename, _ = QFileDialog.getSaveFileName(
