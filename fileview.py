@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QFileDialog
 )
-import time
+import time, os
 from view import MainWindow
 
 #
