@@ -192,12 +192,12 @@ class MainWindow(QMainWindow):
         self.file_list_display.setEnabled(False)
 
         join_pdf_label = QLabel("Join\\Combine Selected Files:\nChoose: PDF, PNG or PDF")
-        self.join_pdf_select_multiple_files = QPushButton("Open Files")
+        self.join_pdf_select_multiple_files = QPushButton("Select Files")
         #self.join_pdf_select_multiple_files.clicked.connect(self.open_files_to_join_button)
 
         self.auto_filename = QCheckBox("Auto Filename")
         self.auto_filename.setChecked(False)
-        self.join_pdf_save_file_button = QPushButton("Save")
+        self.join_pdf_save_file_button = QPushButton("Merge Files")
         self.join_pdf_save_file_button.setEnabled(False)
         #self.join_pdf_save_file_button.clicked.connect(self.save_file_list)
 
@@ -282,11 +282,11 @@ class MainWindow(QMainWindow):
         tab_5_right.addWidget(self.extract_pdf_to_word_button)
 
         # Add tabs to main tab widget
-        self.tab_widget.addTab(tab_1_widget, "Search PDF")
-        self.tab_widget.addTab(tab2_content, "Extract PDF Pages")
-        self.tab_widget.addTab(tab3_content, "Join Files")
-        self.tab_widget.addTab(tab4_content, "File Conversions")
-        self.tab_widget.addTab(tab_5_content, "PDF to Text")
+        self.tab_widget.addTab(tab_1_widget, "Search")
+        self.tab_widget.addTab(tab2_content, "Extract Pages")
+        self.tab_widget.addTab(tab3_content, "Append Files")
+        self.tab_widget.addTab(tab4_content, "PDF -> Image")
+        self.tab_widget.addTab(tab_5_content, "PDF -> Text")
         
         self.tab_widget.setFixedHeight(250)
         self.tab_widget.currentChanged.connect(self.tab_changed)

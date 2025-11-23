@@ -39,20 +39,20 @@ class MainController(QObject):
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
         self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
-        self._view.save_pdf_button.clicked.connect(self.save_pdf)
+        self._view.save_pdf_button.clicked.connect(self.save_pdf_from_search)
         # tab2
         self._view.extract_pages_file_open_button.clicked.connect(self.call_selected_tab)
         self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         # tab3
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
-        self._view.join_pdf_save_file_button.clicked.connect(self.join_pdf_save)
+        self._view.join_pdf_save_file_button.clicked.connect(self.append_pdf_files)
         # tab4
     #
-    def join_pdf_save(self):
+    def append_pdf_files(self):
         file_path = self._fileview.user_filename_input_dialog(self._view.get_output_filename_flag)
         if file_path:
             self.file_path = file_path
-            self.save_pdf()
+            self.merge_pdfs()
         else:
             print("file not saved")
        
@@ -390,10 +390,10 @@ class MainController(QObject):
     #
     # save pdf from a list of pages
     #
-    def save_pdf(self):
+    def save_pdf_from_search(self):
         # all files saved to output
-        print("save pdf", self.file_list)
         page_list = self.file_list
+        # search specific term used to create output file
         search_string = self._view.search_pdf_input_word.text()
         self._view.status_bar_label.setText("save pdf")
         now = datetime.now()
