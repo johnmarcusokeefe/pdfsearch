@@ -47,12 +47,13 @@ class FileDialogue:
     #
     def user_filename_input_dialog(self, flag):
         # Open a QFileDialog for saving a file
+
         current_timestamp = time.time()
         if flag == True:
             filename = f"output/merge_{len(self.file_list)}_pages_{current_timestamp}.pdf"
         else:
             filename, _ = QFileDialog.getSaveFileName(
-                self,
+                None,
                 "Save File",
                 "output",  # Initial directory (empty string for default)
                 "PDF Files (*.pdf);;All Files (*)" # File filters

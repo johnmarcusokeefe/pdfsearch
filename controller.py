@@ -31,7 +31,9 @@ class MainController(QObject):
         self.file_list = []
         # connect signals and slots
         self.connect_signals()
-       
+    #
+    # connect view signals
+    #     
     def connect_signals(self):
         #tab1
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
@@ -43,9 +45,17 @@ class MainController(QObject):
         self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         # tab3
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
-        self._view.join_pdf_save_file_button.clicked.connect( self._fileview.user_filename_input_dialog)
+        self._view.join_pdf_save_file_button.clicked.connect(self.join_pdf_save)
         # tab4
     #
+    def join_pdf_save(self):
+        file_path = self._fileview.user_filename_input_dialog(self._view.get_output_filename_flag)
+        if file_path:
+            self.file_path = file_path
+            self.save_pdf()
+        else:
+            print("file not saved")
+       
     # open file path and add the path to an instance string
     # 
     def set_file_path(self):
@@ -382,6 +392,7 @@ class MainController(QObject):
     #
     def save_pdf(self):
         # all files saved to output
+        print("save pdf", self.file_list)
         page_list = self.file_list
         search_string = self._view.search_pdf_input_word.text()
         self._view.status_bar_label.setText("save pdf")

@@ -328,7 +328,6 @@ class MainWindow(QMainWindow):
     # toggle log window open/closed
     #
     def open_log_window(self):
-        self.display_sizes()
         if self.terminal_log.isVisible():
             self.terminal_log.hide()
             # do dynamically
@@ -410,7 +409,7 @@ class MainWindow(QMainWindow):
         self.extract_pdf_to_images_button.setEnabled(False)
 
     #
-    #
+    # 
     #
     def get_output_filename_flag(self):
         if self.auto_filename.isChecked():
