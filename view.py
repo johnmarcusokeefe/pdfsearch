@@ -289,7 +289,7 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(tab_5_content, "PDF -> Text")
         
         self.tab_widget.setFixedHeight(250)
-        self.tab_widget.currentChanged.connect(self.tab_changed)
+        self.tab_widget.currentChanged.connect(self.tab_change)
 
         layout.addWidget(self.tab_widget, alignment=Qt.AlignTop)
 
@@ -337,8 +337,8 @@ class MainWindow(QMainWindow):
             self.terminal_log.show()
     
     # 
-    def tab_changed(self):
-        print("new tab selected")
+    def tab_change(self):
+        print("new tab selected",self.tab_widget.currentIndex())
         self.clear_all_values()
         
     # tab 2

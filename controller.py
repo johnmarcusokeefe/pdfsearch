@@ -48,7 +48,6 @@ class MainController(QObject):
         self._view.join_pdf_save_file_button.clicked.connect(self.merge_pdfs)
         # tab4
     #
-        #
     # process based on selected tab
     #
     def call_selected_tab(self):
@@ -86,8 +85,7 @@ class MainController(QObject):
             print("tab 4")
         if self._view.tab_widget.currentIndex() == 4:
             print("tab 5")
-
-       
+    #
     # open file path and add the path to an instance string
     # 
     def set_file_path(self):
@@ -97,11 +95,10 @@ class MainController(QObject):
             self.file_path = file_path
         # update feedback labels
         print("open file path",self.file_path)
-   
-   
+    #
     # use a feedback window to confirm files added
+    #
     def set_multiple_file_paths(self):
-
         file_list_in = []
         files = self._fileview.open_multiple_files_dialog()
         if len(files) > 1:
@@ -128,8 +125,8 @@ class MainController(QObject):
                 self._view.terminal_log.append("File Operation Cancelled")
         else:
             self._view.status_bar_label.setText("files not selected")
-        
-
+    #   
+    # add page numbers to a file list view
     #
     def add_pages_to_list_view(self):
         self._view.split_pdf_save_file_button.setEnabled(True)
@@ -155,11 +152,16 @@ class MainController(QObject):
             page_list.append(index.row())
             print(f"Row: {index.row()}, Column: {index.column()}, Data: {index.data()}")
         # call extract and set output path
-        self._view.output_file_label.setText(f"output path: {os.path.dirname(self.extract_pdfs(page_list))}")    
+        self._view.output_file_label.setText(f"output path: {os.path.dirname(self.extract_pdfs(page_list))}")   
     #
+    # main search method that gets input values,
     #
     def search_pdf(self):
-        self.file_list = self.process_pdf_file_for_search(self.file_path, self._view.get_search_word(), self._view.get_level())
+        # get the input word from the input widget
+        search_word = self._view.get_search_word()
+        # get an interger value to set levenshtein level
+        level = self._view.get_level()
+        self.file_list = self.process_pdf_file_for_search(self.file_path, search_word, level)
         if len(self.file_list) == 0:
             self._view.terminal_log.append("search result empty")
         self._view.search_save_pdf_label.setText(f"{len(self.file_list)} pages ready to merge")
@@ -223,9 +225,6 @@ class MainController(QObject):
                 fuzzy_total = fuzzy_total + fuzzy_result
                 page_list.append(page_num)
                 self._view.save_pdf_button.setEnabled(True)
-            # search text on page and if text found create an array of page numbers
-                # if text.lower().find(search_string.get().lower()) != -1:
-                #     print("text found on page ", page_num)
         print(f"pdf search page list: {page_list}")
         self._view.search_found_label.setText("No Matches Found")
         if len(page_list) > 0:
@@ -289,9 +288,9 @@ class MainController(QObject):
         
         pdf_ext = ".pdf"
         file_list = self.file_list
-       
-        
         self._view.status_bar_label.setText("merging pdf")
+        # filename needs to be created for merged files
+        file_name = "text"
         # test if has pdf extension
         if pdf_ext.lower() in file_name.lower():
             output_filename = file_name
