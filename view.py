@@ -206,7 +206,6 @@ class MainWindow(QMainWindow):
         tab3_right.addWidget(self.join_pdf_select_multiple_files)
         tab3_right.addWidget(self.auto_filename)
         tab3_right.addWidget(self.join_pdf_save_file_button)
-
         # ---------------
         # | Tab 4 layout |
         # ---------------
@@ -223,22 +222,22 @@ class MainWindow(QMainWindow):
 
         self.extract_pdf_to_images_label = QLabel("PDF to Image:")
         self.extract_pdf_to_images_open_files_button = QPushButton("Open File")
-        self.extract_pdf_to_images_open_files_button.clicked.connect(self.open_file_convert_pdf_to_image)
+        #self.extract_pdf_to_images_open_files_button.clicked.connect(self.open_file_convert_pdf_to_image)
        
         self.pdf_to_image_page_count_label = QLabel("Pages:")
         self.extract_pdf_to_images_filetype = QComboBox()
         self.extract_pdf_to_images_filetype.addItems(["Filetype","jpg","png"])
-        self.extract_pdf_to_images_filetype.currentIndexChanged.connect(self.pdf_to_image_button_check)
+        #self.extract_pdf_to_images_filetype.currentIndexChanged.connect(self.pdf_to_image_button_check)
         self.extract_pdf_to_images_filetype.setEnabled(False)
         
         self.extract_pdf_to_images_quality = QComboBox()
         self.extract_pdf_to_images_quality.addItems(["Quality","High: 600dpi","Medium: 300dpi","Low: 150dpi"])
-        self.extract_pdf_to_images_quality.currentIndexChanged.connect(self.pdf_to_image_button_check)
+        #self.extract_pdf_to_images_quality.currentIndexChanged.connect(self.pdf_to_image_button_check)
         self.extract_pdf_to_images_quality.setEnabled(False)
 
         self.extract_pdf_to_images_button = QPushButton("Extract to Images")
         self.extract_pdf_to_images_button.setEnabled(False)
-        self.extract_pdf_to_images_button.clicked.connect(self.pdf_to_image_button)
+        #self.extract_pdf_to_images_button.clicked.connect(self.pdf_to_image_button)
 
         tab4_left.addWidget(self.extract_pdf_to_images_label)
         tab4_left.addWidget(self.pdf_to_image_page_count_label)
@@ -249,7 +248,6 @@ class MainWindow(QMainWindow):
         tab4_right.addWidget(self.extract_pdf_to_images_filetype)
         tab4_right.addWidget(self.extract_pdf_to_images_quality)
         tab4_right.addWidget(self.extract_pdf_to_images_button)
-
         # ---------------
         # | Tab 5 layout |
         # ---------------

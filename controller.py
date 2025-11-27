@@ -47,6 +47,11 @@ class MainController(QObject):
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
         self._view.join_pdf_save_file_button.clicked.connect(self.merge_pdfs)
         # tab4
+        self._view.extract_pdf_to_images_open_files_button.clicked.connect(self.set_multiple_file_paths)
+        #
+        self._view.extract_pdf_to_images_filetype.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
+        self._view.extract_pdf_to_images_quality.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
+        self._view.extract_pdf_to_images_button.clicked.connect(self._view.pdf_to_image_button)
     #
     # process based on selected tab
     #
