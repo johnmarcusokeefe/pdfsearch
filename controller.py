@@ -87,7 +87,7 @@ class MainController(QObject):
             print("tab 3")
         # tab 4
         if self._view.tab_widget.currentIndex() == 3:
-            print("tab 4")
+            self.set_file_path()
         if self._view.tab_widget.currentIndex() == 4:
             print("tab 5")
     #
@@ -98,6 +98,7 @@ class MainController(QObject):
         file_path = self._fileview.open_file_dialog()
         if file_path:
             self.file_path = file_path
+            
         # update feedback labels
         print("open file path",self.file_path)
     #

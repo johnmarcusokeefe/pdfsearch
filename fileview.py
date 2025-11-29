@@ -12,34 +12,36 @@ class FileDialogue:
     def __init__(self):
         super().__init__()
 
-        
+    #    
     # Open a file dialog to select a single file
+    #
     def open_file_dialog(self):
         
-        #last_directory = self.load_text("output/last_opened.txt")
-   
+        file_path = ""
+        self.last_path_opened = self.load_text()
         file_path, _ = QFileDialog.getOpenFileName(
             None,
             "Open File",  # Dialog title
-            "output",      # Initial directory (can be an empty string for default)
+            str(self.last_path_opened),      # Initial directory (can be an empty string for default)
             "PDF Files (*.pdf);;All Files (*.*)" # File filters
         )
         print("open file dialog", file_path)
+        self.save_text(file_path)
         return file_path
-
-       
-
-    
+    #
+    # return file list
+    #
     def open_multiple_files_dialog(self):
         file_list = []
+        self.last_path_opened = self.load_text()
         file_list, _ = QFileDialog.getOpenFileNames(
             None,
             "Select Multiple Files",
-            "",  # Current working directory
+            str(self.last_path_opened),  # Current working directory
             "PDF Files (*.pdf);;JPEG Files (*.jpg);;PNG Files (*.png);;All Files (*.*)"
         )
         # 
-        print("open multiple files", file_list )
+        print("open multiple files", file_list)
         return file_list
     
     #
@@ -60,18 +62,21 @@ class FileDialogue:
             )
             print("return filename", filename)
         return filename
-    
-    
+    #
     # get text file data
-    def load_text(self, filename):
+    #
+    def load_text(self):
         try:
-            with open(filename, "r") as file:
+            with open("saved_path.txt", "r") as file:
                 return [line.strip() for line in file.readlines()]
         except FileNotFoundError:
-            return "output"
-        
+            output_path = "/"
+            self.save_text(output_path)
+            return output_path
+    #   
     # use to save last folder accessed
-    def save_text(self, output_path_text, output_path):
-        dir_name = os.path.dirname(output_path_text)
-        with open(output_path,'w') as file:
-            file.write(dir_name)
+    #
+    def save_text(self, output_path):
+        file_name = "saved_path.txt"
+        with open(file_name,'w') as file:
+            file.write(os.path.dirname(output_path))
