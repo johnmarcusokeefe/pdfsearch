@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Signal, QObject
 # my files
 from view import MainWindow, FeedbackWindow
+from pypdf import PdfReader
 
 from fileview import FileDialogue
 #
@@ -54,7 +55,8 @@ class MainController(QObject):
         self._view.extract_pdf_to_images_button.clicked.connect(self._view.pdf_to_image_button)
         # tab5
         self._view.extract_pdf_open_file_button.clicked.connect(self.call_selected_tab)
-        self._view.extract_pdf_content_button.clicked.connect(self.convert_pdf_to_word)
+        self._view.extract_pdf_to_word_content_button.clicked.connect(self.convert_pdf_to_word)
+        self._view.extract_pdf_to_text_button.clicked.connect(self.convert_pdf_to_text)
     #
     # process based on selected tab
     #
@@ -379,8 +381,8 @@ class MainController(QObject):
     #
     # convert pdf to word document 
     #
-    def convert_pdf_to_word(docx_file_path, file_path):
-        print(file_path)
+    def convert_pdf_to_word(self):
+        
         """
         Converts a PDF file to a DOCX (Word) document.
 
@@ -389,13 +391,24 @@ class MainController(QObject):
             docx_file_path (str): The desired path for the output DOCX file.
         """
         try:
-            cv = Converter(file_path)
+            docx_file_path = self.file_path+".docx"
+            cv = Converter(self.file_path)
             cv.convert(docx_file_path, start=0, end=None) # start and end pages (optional)
             cv.close()
-            print(f"Successfully converted '{file_path}' to '{docx_file_path}'")
+            print(f"Successfully converted '{self.file_path}' to '{docx_file_path}'")
         except Exception as e:
             print(f"Error converting PDF to Word: {e}")
-    
+
+    def convert_pdf_to_text(self):
+        """Extracts all text from a digital PDF file."""
+        reader = PdfReader(self.file_path)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or "" # Use or "" to handle empty pages
+        with open("output/output.txt", 'w') as f:
+            f.write(text)
+        
+
     #
     # save pdf from a list of pages
     #
