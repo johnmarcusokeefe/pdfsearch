@@ -52,13 +52,18 @@ class MainController(QObject):
         self._view.extract_pdf_to_images_filetype.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
         self._view.extract_pdf_to_images_quality.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
         self._view.extract_pdf_to_images_button.clicked.connect(self._view.pdf_to_image_button)
+        # tab5
+        self._view.extract_pdf_open_file_button.clicked.connect(self.call_selected_tab)
+        self._view.extract_pdf_content_button.clicked.connect(self.convert_pdf_to_word)
     #
     # process based on selected tab
     #
     def call_selected_tab(self):
         
-        print("button validation", self._view.tab_widget.currentIndex())
-        if self._view.tab_widget.currentIndex() == 0:
+        tab_number = self._view.tab_widget.currentIndex()
+        
+        print("call_selected_tab method", tab_number + 1)
+        if tab_number == 0:
             self.set_file_path()
             is_searchable = self.check_pdf()
             print("search tab")
@@ -72,12 +77,12 @@ class MainController(QObject):
             #
             self._view.update_labels("search", self.file_path)
         # tab 2 selected
-        if self._view.tab_widget.currentIndex() == 1:
+        if tab_number == 1:
             self.set_file_path()
             self.add_pages_to_list_view()
             print("tab 2")
         # tab 3
-        if self._view.tab_widget.currentIndex() == 2:
+        if tab_number == 2:
             flag = self._view.get_output_filename_flag()
             file_name = self._fileview.user_filename_input_dialog(flag)
             if file_name != "":
@@ -86,10 +91,12 @@ class MainController(QObject):
                 print("no filename provided")
             print("tab 3")
         # tab 4
-        if self._view.tab_widget.currentIndex() == 3:
+        if tab_number == 3:
             self.set_file_path()
-        if self._view.tab_widget.currentIndex() == 4:
+        # tab 5
+        if tab_number == 4:
             print("tab 5")
+            self.set_file_path()
     #
     # open file path and add the path to an instance string
     # 

@@ -264,20 +264,19 @@ class MainWindow(QMainWindow):
         tab_5_main.addLayout(tab_5_right, 1)
         tab_5_content.setLayout(tab_5_main)
 
-        self.extract_pdf_to_word_label = QLabel("PDF to Word:")
+        self.extract_pdf_to_word_label = QLabel("Extract PDF Content:")
         tab_5_left.addWidget(self.extract_pdf_to_word_label)
         
-        tab_5_left.addWidget(self.extract_pdf_to_word_label)
         
-        self.extract_pdf_to_word_open_files_button = QPushButton("Open File")
-        tab_5_right.addWidget(self.extract_pdf_to_word_open_files_button)
+        self.extract_pdf_open_file_button = QPushButton("Open File")
+        tab_5_right.addWidget(self.extract_pdf_open_file_button)
 
         self.extract_pdf_to_word_label = QLabel("Extract")
         tab_5_left.addWidget(self.extract_pdf_to_word_label)
 
-        self.extract_pdf_to_word_button = QPushButton("Run")
-        self.extract_pdf_to_word_button.clicked.connect(self.convert_pdf_to_word)
-        tab_5_right.addWidget(self.extract_pdf_to_word_button)
+        self.extract_pdf_content_button = QPushButton("Run")
+        #self.extract_pdf_to_word_button.clicked.connect(self.convert_pdf_to_word)
+        tab_5_right.addWidget(self.extract_pdf_content_button)
 
         # Add tabs to main tab widget
         self.tab_widget.addTab(tab_1_widget, "Search")
@@ -336,7 +335,7 @@ class MainWindow(QMainWindow):
     
     # 
     def tab_change(self):
-        print("new tab selected",self.tab_widget.currentIndex())
+        print("new tab selected",self.tab_widget.currentIndex()+1)
         self.clear_all_values()
         
     # tab 2
