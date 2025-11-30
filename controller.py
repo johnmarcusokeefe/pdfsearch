@@ -13,7 +13,7 @@ from pdf2image import convert_from_path
 from pdf2docx import Converter
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Signal, QObject
-# my files
+# local files
 from view import MainWindow, FeedbackWindow
 from pypdf import PdfReader, PdfWriter
 
@@ -63,7 +63,6 @@ class MainController(QObject):
     def call_selected_tab(self):
         
         tab_number = self._view.tab_widget.currentIndex()
-        
         print("call_selected_tab method", tab_number + 1)
         if tab_number == 0:
             self.set_file_path()
@@ -95,10 +94,21 @@ class MainController(QObject):
         # tab 4
         if tab_number == 3:
             self.set_file_path()
+            #test if text
+
         # tab 5
         if tab_number == 4:
             print("tab 5")
             self.set_file_path()
+            # test if text
+            if self.check_pdf() == 0:
+                self.ocr_file(self.file_path) 
+                self._view.extract_pdf_to_text_button.setEnabled(True)
+                self._view.extract_pdf_to_word_content_button.setEnabled(True)
+            else:
+                self._view.extract_pdf_to_text_button.setEnabled(True)
+                self._view.extract_pdf_to_word_content_button.setEnabled(True)
+
     #
     # open file path and add the path to an instance string
     # 
@@ -264,8 +274,10 @@ class MainController(QObject):
         # sets the search path
         self.file_path = output_pdf_path
         self._view.search_open_file_label.setText(self.file_path)
+        #set buttons true
         self._view.search_pdf_button.setEnabled(True)
         self._view.search_pdf_combo.setEnabled(True)
+        
     #
     # extract pages
     #
@@ -391,24 +403,28 @@ class MainController(QObject):
             docx_file_path (str): The desired path for the output DOCX file.
         """
         try:
-            docx_file_path = self.file_path+".docx"
+            filename = os.path.basename(self.file_path)+".docx"
+            docx_file_path = "output/"+filename
             cv = Converter(self.file_path)
             cv.convert(docx_file_path, start=0, end=None) # start and end pages (optional)
             cv.close()
             print(f"Successfully converted '{self.file_path}' to '{docx_file_path}'")
+            self._view.status_bar_label.setText("word file created")
         except Exception as e:
             print(f"Error converting PDF to Word: {e}")
-
+    #
+    # convert pdf to text
+    #
     def convert_pdf_to_text(self):
         """Extracts all text from a digital PDF file."""
         reader = PdfReader(self.file_path)
         text = ""
+        filename = os.path.basename(self.file_path)
         for page in reader.pages:
             text += page.extract_text() or "" # Use or "" to handle empty pages
-        with open("output/output.txt", 'w') as f:
+        with open("output/"+filename+".txt", 'w') as f:
             f.write(text)
-        
-
+        self._view.status_bar_label.setText("text file created")
     #
     # save pdf from a list of pages
     #
