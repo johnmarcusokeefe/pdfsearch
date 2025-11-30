@@ -15,7 +15,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Signal, QObject
 # my files
 from view import MainWindow, FeedbackWindow
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 
 from fileview import FileDialogue
 #
