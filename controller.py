@@ -32,6 +32,7 @@ class MainController(QObject):
         self.file_list = []
         # connect signals and slots
         self.connect_signals()
+
     # ------------------------ #
     #   connect input signals  #
     # -------------------------#  
@@ -64,7 +65,7 @@ class MainController(QObject):
     #  reset all values   #
     # --------------------#
     def tab_change(self):
-        print("new tab selected",self.tab_widget.currentIndex()+1)
+        print("new tab selected",self._view.tab_widget.currentIndex()+1)
         self._view.file_path = ""
         self._view.search_found_label.setText("Search Pending")
         self._view.search_save_pdf_label.setText("0 pages ready to merge")
