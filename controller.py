@@ -469,7 +469,6 @@ class MainController(QObject):
         search_string = self._view.search_pdf_input_word.text()
         self._view.status_bar_label.setText("save pdf")
         now = datetime.now()
-        print("save pdf", self.file_path)
         print("page list array", page_list)
         reader = PdfReader(self.file_path)
         if len(page_list) > 0:

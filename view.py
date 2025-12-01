@@ -198,6 +198,7 @@ class MainWindow(QMainWindow):
         tab_3_right.addWidget(self.join_pdf_select_multiple_files)
         tab_3_right.addWidget(self.auto_filename)
         tab_3_right.addWidget(self.join_pdf_save_file_button)
+
         # ---------------
         # | Tab 4 layout |
         # ---------------
@@ -231,11 +232,19 @@ class MainWindow(QMainWindow):
         tab_4_left.addWidget(self.extract_images_from_pdf_count_label)
         tab_4_left.setAlignment(Qt.AlignTop)
         
+<<<<<<< HEAD
         tab_4_right.addWidget(self.extract_images_from_pdf_open_file_button)
         #self.extract_pdf_to_images_open_files_button.setFixedSize(QSize(150, 40))
         tab_4_right.addWidget(self.extract_images_from_pdf_filetype_combo)
         tab_4_right.addWidget(self.extract_images_from_pdf_quality_combo)
         tab_4_right.addWidget(self.extract_images_from_pdf_run_button)
+=======
+        tab_4_right.addWidget(self.extract_pdf_to_images_open_files_button)
+        tab_4_right.addWidget(self.extract_pdf_to_images_filetype)
+        tab_4_right.addWidget(self.extract_pdf_to_images_quality)
+        tab_4_right.addWidget(self.extract_pdf_to_images_button)
+
+>>>>>>> 00cb592 (mac updates)
         # ---------------
         # | Tab 5 layout |
         # ---------------
@@ -342,10 +351,69 @@ class MainWindow(QMainWindow):
             # if pages found returns a count otherwise 0v
             self.terminal_log.append(f"Selected file: {file_path}")
     #
+<<<<<<< HEAD
+=======
+    # check if image conversion buttons are selected
+    #
+    def pdf_to_image_button_check(self):
+
+        if self.extract_images_to_pdf_filetype_combo.currentIndex() > 0 and self.extract_images_to_pdf_quality_combo.currentIndex() > 0:
+            self.extract_images_to_pdf_run_button.setEnabled(True)
+        else:
+            self.extract_images_to_pdf_run_button.setEnabled(False)
+        if self.file_path == "":
+            self.extract_images_to_pdf_run_button.setEnabled(False)
+
+    # ------------------- #
+    #  reset all values    #
+    # --------------------#
+    def clear_all_values(self):
+        self.file_path = ""
+        self.search_found_label.setText("Search Pending")
+        self.search_save_pdf_label.setText(" 0pages ready to merge")
+        self.output_file_label.setText("Output path:")
+        self.status_bar_label.setText("")
+        self.extract_pdf_to_images_label.setText("Open File:")
+        self.select_page_list.clear()
+        self.extract_images_to_pdf_filetype_combo.setCurrentIndex(0)
+        self.extract_images_to_pdf_quality_combo.setCurrentIndex(0)
+        self.extract_images_to_pdf_run_button.setEnabled(False)
+
+    #
+    # 
+    #
+  
+    def get_level(self):
+        return self.search_pdf_combo.currentText()
+    
+    def get_search_word(self):
+        return self.search_pdf_input_word.text()
+    
+    def pdf_to_image_button(self):
+        filetype = self.extract_images_to_pdf_filetype_combo.currentIndex()
+        quality = self.extract_images_to_pdf_quality_combo.currentIndex()
+        #
+        if filetype == 1:
+            file_t = 'jpeg'
+        else:
+            file_t = 'png'
+        #
+        if quality == 1:
+            dpi = 600
+        elif quality == 3:
+            dpi = 150
+        else: 
+            dpi = 300
+        # called convert to images using thread
+        out_path, count = self.ctr.pdf_to_image(self, dpi, file_t)
+        self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
+    #
+>>>>>>> 00cb592 (mac updates)
     #
     #
     def open_finder_window(self):
         path = "output"
+        
         """
         Opens a Finder window to the specified path on macOS.
         Args:
