@@ -57,6 +57,24 @@ class MainController(QObject):
         self._view.extract_pdf_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.extract_pdf_to_word_content_button.clicked.connect(self.convert_pdf_to_word)
         self._view.extract_pdf_to_text_button.clicked.connect(self.convert_pdf_to_text)
+
+        self._view.tab_widget.currentChanged.connect(self.tab_change)
+
+    # ------------------- #
+    #  reset all values    #
+    # --------------------#
+    def tab_change(self):
+        print("new tab selected",self.tab_widget.currentIndex()+1)
+        self._view.file_path = ""
+        self._view.search_found_label.setText("Search Pending")
+        self._view.search_save_pdf_label.setText("0 pages ready to merge")
+        self._view.output_file_label.setText("Output path:")
+        self._view.status_bar_label.setText("")
+        #self.extract_images_from_pdf_label.setText("Open File:")
+        self._view.select_page_list.clear()
+        self._view.extract_images_from_pdf_filetype_combo.setCurrentIndex(0)
+        self._view.extract_images_from_pdf_quality_combo.setCurrentIndex(0)
+        self._view.extract_images_from_pdf_run_button.setEnabled(False)
     #
     # process based on selected tab
     #
@@ -131,8 +149,7 @@ class MainController(QObject):
         file_list_in = []
         files = self._fileview.open_multiple_files_dialog()
         if len(files) > 1:
-            #self.status_bar_label.setText(f"files selected")    
-            #print("Selected files:")
+            self._view.status_bar_label.setText("files selected")    
             self._view.join_pdf_save_file_button.setEnabled(True)
             for path in files:
                 file_list_in.append(path)

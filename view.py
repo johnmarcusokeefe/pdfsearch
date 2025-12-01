@@ -119,7 +119,6 @@ class MainWindow(QMainWindow):
         self.search_pdf_combo.setEnabled(False)
         self.search_found_label = QLabel("Search Pending")
 
-        
         self.search_pdf_button = QPushButton("fuzzy search")
         self.search_pdf_button.setEnabled(False)
 
@@ -131,7 +130,6 @@ class MainWindow(QMainWindow):
 
         self.save_pdf_button = QPushButton("save")
         self.save_pdf_button.setEnabled(False)
-        #self.save_pdf_button.clicked.connect(self.save_pdf)
 
         tab_1_left.addWidget(self.search_open_file_label)
         tab_1_left.addWidget(self.ocr_pdf_label)
@@ -145,7 +143,6 @@ class MainWindow(QMainWindow):
         tab_1_right.addWidget(self.search_pdf_button)
         tab_1_right.addWidget(self.save_pdf_button)
         
-
         # ---------------
         # | Tab 2 layout |
         # ---------------
@@ -276,7 +273,6 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(tab_5_content, "PDF -> Text")
         
         self.tab_widget.setFixedHeight(250)
-        self.tab_widget.currentChanged.connect(self.tab_change)
 
         layout.addWidget(self.tab_widget, alignment=Qt.AlignTop)
 
@@ -322,13 +318,9 @@ class MainWindow(QMainWindow):
         else:
             self.setFixedHeight(self.height()+314)
             self.terminal_log.show()
-    
-    # 
-    def tab_change(self):
-        print("new tab selected",self.tab_widget.currentIndex()+1)
-        self.clear_all_values()
-        
+    #
     # tab 2
+    #
     def list_select(self):
         print("item selected", self.select_page_list.selectedIndexes())
         self.terminal_log.append("new selection")
@@ -349,41 +341,7 @@ class MainWindow(QMainWindow):
             #
             # if pages found returns a count otherwise 0v
             self.terminal_log.append(f"Selected file: {file_path}")
-    
-    # ------------------- #
-    #  reset all values    #
-    # --------------------#
-    def clear_all_values(self):
-        self.file_path = ""
-        self.search_found_label.setText("Search Pending")
-        self.search_save_pdf_label.setText("0 pages ready to merge")
-        self.output_file_label.setText("Output path:")
-        self.status_bar_label.setText("")
-        #self.extract_images_from_pdf_label.setText("Open File:")
-        self.select_page_list.clear()
-        self.extract_images_from_pdf_filetype_combo.setCurrentIndex(0)
-        self.extract_images_from_pdf_quality_combo.setCurrentIndex(0)
-        self.extract_images_from_pdf_run_button.setEnabled(False)
-    
-    def pdf_to_image_button(self):
-        filetype = self.extract_images_from_pdf_filetype_combo.currentIndex()
-        quality = self.extract_images_from_pdf_quality_combo.currentIndex()
-        #
-        if filetype == 1:
-            file_t = 'jpeg'
-        else:
-            file_t = 'png'
-        #
-        if quality == 1:
-            dpi = 600
-        elif quality == 3:
-            dpi = 150
-        else: 
-            dpi = 300
-        # called convert to images using thread
-        out_path, count = self.ctr.pdf_to_image(self, dpi, file_t)
-        self.output_file_label.setText(f"Output path: {out_path}\nFiles converted: {count}")
-
+    #
     #
     #
     def open_finder_window(self):
