@@ -234,11 +234,11 @@ class MainWindow(QMainWindow):
         tab_4_left.addWidget(self.pdf_to_image_page_count_label)
         tab_4_left.setAlignment(Qt.AlignTop)
         
-        tab4_right.addWidget(self.extract_images_from_pdf_open_file_button)
+        tab_4_right.addWidget(self.extract_images_from_pdf_open_file_button)
         #self.extract_pdf_to_images_open_files_button.setFixedSize(QSize(150, 40))
-        tab4_right.addWidget(self.extract_images_from_pdf_filetype_combo)
-        tab4_right.addWidget(self.extract_images_from_pdf_quality_combo)
-        tab4_right.addWidget(self.extract_images_from_pdf_run_button)
+        tab_4_right.addWidget(self.extract_images_from_pdf_filetype_combo)
+        tab_4_right.addWidget(self.extract_images_from_pdf_quality_combo)
+        tab_4_right.addWidget(self.extract_images_from_pdf_run_button)
         # ---------------
         # | Tab 5 layout |
         # ---------------
