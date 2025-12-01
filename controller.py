@@ -460,20 +460,7 @@ class MainController(QObject):
             self._view.terminal_log.append("no files in list save_pdf")
             
         self._view.save_pdf_button.setEnabled(False)
-    #
-    #
-    #
-    # def check_if_ocr_required(self, is_text_plus_num_pages):
-    #     if is_text_plus_num_pages == 0:
-    #         self.ocr_file(self._view, self._view.file_path)
-    #         self._view.search_pdf_button.setEnabled(True)  
-    #     else:
-    #         self.page_number_input.setEnabled(True)
-    #         self._view.search_pdf_button.setEnabled(True)
-    #         self._view.terminal_log(f"File page count: {is_text_plus_num_pages}")
-    #         self._view.page_number_input.clear()
-    #         pages = self.check_pdf(self._view.file_path)
-    #         self._view.page_count_label.setText(f"Page count: {pages}")
+
 
 if __name__ == "__main__":
 
