@@ -227,8 +227,8 @@ class MainWindow(QMainWindow):
         self.extract_images_from_pdf_run_button = QPushButton("Extract to Images")
         self.extract_images_from_pdf_run_button.setEnabled(False)
 
-        tab_4_left.addWidget(self.extract_pdf_to_images_label)
-        tab_4_left.addWidget(self.pdf_to_image_page_count_label)
+        tab_4_left.addWidget(self.extract_images_from_pdf_label)
+        tab_4_left.addWidget(self.extract_images_from_pdf_count_label)
         tab_4_left.setAlignment(Qt.AlignTop)
         
         tab_4_right.addWidget(self.extract_images_from_pdf_open_file_button)
