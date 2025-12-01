@@ -50,9 +50,9 @@ class MainController(QObject):
         # tab4
         self._view.extract_images_from_pdf_open_file_button.clicked.connect(self.call_selected_tab)
         #
-        self._view.extract_pdf_to_images_filetype.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
-        self._view.extract_pdf_to_images_quality.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
-        self._view.extract_pdf_to_images_button.clicked.connect(self._view.pdf_to_image_button)
+        self._view.extract_images_from_pdf_filetype_combo.currentIndexChanged.connect(self.extract_images_from_pdf_button_check)
+        self._view.extract_images_from_pdf_quality_combo.currentIndexChanged.connect(self.extract_images_from_pdf_button_check)
+        self._view.extract_images_from_pdf_run_button.clicked.connect(self.pdf_to_image)
         # tab5
         self._view.extract_pdf_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.extract_pdf_to_word_content_button.clicked.connect(self.convert_pdf_to_word)
@@ -96,9 +96,8 @@ class MainController(QObject):
             self.set_file_path()
             if self.file_path:
                 self._view.extract_images_from_pdf_label.setText(f"Path: {self.file_path}")
-                self._view.extract_images_to_pdf_filetype_combo.setEnabled(True)
-                self._view.extract_images_to_pdf_quality_combo.setEnabled(False)
-                self._view.extract_images_to_pdf_run_button.setEnabled(True)
+                self._view.extract_images_from_pdf_filetype_combo.setEnabled(True)
+                self._view.extract_images_from_pdf_quality_combo.setEnabled(True)
 
             #test if text
 
@@ -114,7 +113,7 @@ class MainController(QObject):
             else:
                 self._view.extract_pdf_to_text_button.setEnabled(True)
                 self._view.extract_pdf_to_word_content_button.setEnabled(True)
-
+    
     #
     # open file path and add the path to an instance string
     # 
@@ -354,21 +353,35 @@ class MainController(QObject):
         self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
         print(f"PDFs merged successfully into {output_filename}")
     
+     #
+    # check if image conversion buttons are selected
+    #
+    def extract_images_from_pdf_button_check(self):
+        print("combo change")
+        if self._view.extract_images_from_pdf_filetype_combo.currentIndex() > 0 and self._view.extract_images_from_pdf_quality_combo.currentIndex() > 0:
+            self._view.extract_images_from_pdf_run_button.setEnabled(True)
+        else:
+            self._view.extract_images_from_pdf_run_button.setEnabled(False)
+        if self.file_path == "":
+            self._view.extract_images_from_pdf_run_button.setEnabled(False)
 
     #
     # pdf to image converter
     #
-    def pdf_to_image(_view, file_path, dpi_in, fmt_in, brightness=0.99):
 
+    def pdf_to_image(self):
+        dpi_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
+        fmt_in = self._view.extract_images_from_pdf_quality_combo.currentText()
+        brightness=0.99
         # Store Pdf with convert_from_path function
-        images = convert_from_path(_view, file_path, dpi=dpi_in, fmt=fmt_in)
+        images = convert_from_path(self.file_path, dpi=dpi_in, fmt=fmt_in)
 
         for i in range(len(images)):
             # Save pages as images in the pdf
             enhancer = ImageEnhance.Brightness(images[i])
             adj_image = enhancer.enhance(brightness) # factor > 1 for brighter, < 1 for darker
             adj_image.save('output/images/page'+str(i)+"."+fmt_in)
-            _view.terminal_log.append('saved: output/images/page'+str(i)+"."+fmt_in)
+            self._view.terminal_log.append('saved: output/images/page'+str(i)+"."+fmt_in)
         
         print("extracted images", len(images))
         return "output/images", len(images)
