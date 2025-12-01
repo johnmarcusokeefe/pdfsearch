@@ -32,9 +32,9 @@ class MainController(QObject):
         self.file_list = []
         # connect signals and slots
         self.connect_signals()
-    #
-    # connect view signals
-    #     
+    # ------------------------ #
+    #   connect input signals  #
+    # -------------------------#  
     def connect_signals(self):
         #tab1
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
@@ -61,7 +61,7 @@ class MainController(QObject):
         self._view.tab_widget.currentChanged.connect(self.tab_change)
 
     # ------------------- #
-    #  reset all values    #
+    #  reset all values   #
     # --------------------#
     def tab_change(self):
         print("new tab selected",self.tab_widget.currentIndex()+1)
