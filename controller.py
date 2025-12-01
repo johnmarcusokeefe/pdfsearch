@@ -32,9 +32,9 @@ class MainController(QObject):
         self.file_list = []
         # connect signals and slots
         self.connect_signals()
-    # ------------------------ #
-    #   connect input signals  #
-    # -------------------------#  
+    #
+    # connect view signals
+    #     
     def connect_signals(self):
         #tab1
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
@@ -61,10 +61,10 @@ class MainController(QObject):
         self._view.tab_widget.currentChanged.connect(self.tab_change)
 
     # ------------------- #
-    #  reset all values   #
+    #  reset all values    #
     # --------------------#
     def tab_change(self):
-        print("new tab selected",self.tab_widget.currentIndex()+1)
+        print("new tab selected",self._view.tab_widget.currentIndex()+1)
         self._view.file_path = ""
         self._view.search_found_label.setText("Search Pending")
         self._view.search_save_pdf_label.setText("0 pages ready to merge")
@@ -469,6 +469,7 @@ class MainController(QObject):
         search_string = self._view.search_pdf_input_word.text()
         self._view.status_bar_label.setText("save pdf")
         now = datetime.now()
+        print("save pdf", self.file_path)
         print("page list array", page_list)
         reader = PdfReader(self.file_path)
         if len(page_list) > 0:
