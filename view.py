@@ -194,13 +194,11 @@ class MainWindow(QMainWindow):
         join_pdf_label = QLabel("Join\\Combine Selected Files:\nChoose: PDF, PNG or PDF")
         self.join_pdf_select_multiple_files = QPushButton("Select Files")
         #self.join_pdf_select_multiple_files.clicked.connect(self.open_files_to_join_button)
-
         self.auto_filename = QCheckBox("Auto Filename")
         self.auto_filename.setChecked(False)
         self.join_pdf_save_file_button = QPushButton("Merge Files")
         self.join_pdf_save_file_button.setEnabled(False)
         #self.join_pdf_save_file_button.clicked.connect(self.save_file_list)
-
         tab3_left.addWidget(self.file_list_display)
         tab3_right.addWidget(join_pdf_label)
         tab3_right.addWidget(self.join_pdf_select_multiple_files)
@@ -220,34 +218,34 @@ class MainWindow(QMainWindow):
         tab4_main.addLayout(tab4_right, 1)
         tab4_content.setLayout(tab4_main)
 
-        self.extract_pdf_to_images_label = QLabel("PDF to Image:")
-        self.extract_pdf_to_images_open_files_button = QPushButton("Open File")
+        self.extract_images_from_pdf_label = QLabel("PDF to Image:")
+        self.extract_images_from_pdf_open_file_button = QPushButton("Open File")
         #self.extract_pdf_to_images_open_files_button.clicked.connect(self.open_file_convert_pdf_to_image)
        
-        self.pdf_to_image_page_count_label = QLabel("Pages:")
-        self.extract_pdf_to_images_filetype = QComboBox()
-        self.extract_pdf_to_images_filetype.addItems(["Filetype","jpg","png"])
+        self.extract_images_from_pdf_count_label = QLabel("Pages:")
+        self.extract_images_to_pdf_filetype_combo = QComboBox()
+        self.extract_images_to_pdf_filetype_combo.addItems(["Filetype","jpg","png"])
         #self.extract_pdf_to_images_filetype.currentIndexChanged.connect(self.pdf_to_image_button_check)
-        self.extract_pdf_to_images_filetype.setEnabled(False)
+        self.extract_images_to_pdf_filetype_combo.setEnabled(False)
         
-        self.extract_pdf_to_images_quality = QComboBox()
-        self.extract_pdf_to_images_quality.addItems(["Quality","High: 600dpi","Medium: 300dpi","Low: 150dpi"])
+        self.extract_images_to_pdf_quality_combo = QComboBox()
+        self.extract_images_to_pdf_quality_combo.addItems(["Quality","High: 600dpi","Medium: 300dpi","Low: 150dpi"])
         #self.extract_pdf_to_images_quality.currentIndexChanged.connect(self.pdf_to_image_button_check)
-        self.extract_pdf_to_images_quality.setEnabled(False)
+        self.extract_images_to_pdf_quality_combo.setEnabled(False)
 
-        self.extract_pdf_to_images_button = QPushButton("Extract to Images")
-        self.extract_pdf_to_images_button.setEnabled(False)
+        self.extract_images_to_pdf_run_button = QPushButton("Extract to Images")
+        self.extract_images_to_pdf_run_button.setEnabled(False)
         #self.extract_pdf_to_images_button.clicked.connect(self.pdf_to_image_button)
 
-        tab4_left.addWidget(self.extract_pdf_to_images_label)
-        tab4_left.addWidget(self.pdf_to_image_page_count_label)
+        tab4_left.addWidget(self.extract_images_from_pdf_label)
+        tab4_left.addWidget(self.extract_images_from_pdf_count_label)
         tab4_left.setAlignment(Qt.AlignTop)
         
-        tab4_right.addWidget(self.extract_pdf_to_images_open_files_button)
+        tab4_right.addWidget(self.extract_images_from_pdf_open_file_button)
         #self.extract_pdf_to_images_open_files_button.setFixedSize(QSize(150, 40))
-        tab4_right.addWidget(self.extract_pdf_to_images_filetype)
-        tab4_right.addWidget(self.extract_pdf_to_images_quality)
-        tab4_right.addWidget(self.extract_pdf_to_images_button)
+        tab4_right.addWidget(self.extract_images_to_pdf_filetype_combo)
+        tab4_right.addWidget(self.extract_images_to_pdf_quality_combo)
+        tab4_right.addWidget(self.extract_images_to_pdf_run_button)
         # ---------------
         # | Tab 5 layout |
         # ---------------
@@ -364,8 +362,8 @@ class MainWindow(QMainWindow):
     def open_file_convert_pdf_to_image(self):
         #file_path = self.filedialog.open_file_dialog()
         # self.extract_pdf_to_images_label.setText(f"Pdf to Image file path: {file_path}")
-        self.extract_pdf_to_images_filetype.setEnabled(True)
-        # self.extract_pdf_to_images_quality.setEnabled(True)
+        #self.extract_pdf_to_images_filetype.setEnabled(True)
+        self.extract_images_to_pdf_quality_combo.setEnabled(True)
         # num_pages = self.ctl.count_pdf_pages(file_path)
         # self.pdf_to_image_page_count_label.setText(f"Pages to convert: {num_pages}")
         # self.terminal_log.setText(f"Filepath: {file_path} loaded with {num_pages} pages")
@@ -381,12 +379,12 @@ class MainWindow(QMainWindow):
     def pdf_to_image_button_check(self):
         #self.terminal_log.append("filetype/imagequality change")
         #self.terminal_log.append("filetype/imagequality change")
-        if self.extract_pdf_to_images_filetype.currentIndex() > 0 and self.extract_pdf_to_images_quality.currentIndex() > 0:
-            self.extract_pdf_to_images_button.setEnabled(True)
+        if self.extract_images_to_pdf_filetype_combo.currentIndex() > 0 and self.extract_images_to_pdf_quality_combo.currentIndex() > 0:
+            self.extract_images_to_pdf_run_button.setEnabled(True)
         else:
-            self.extract_pdf_to_images_button.setEnabled(False)
+            self.extract_images_to_pdf_run_button.setEnabled(False)
         if self.file_path == "":
-            self.extract_pdf_to_images_button.setEnabled(False)
+            self.extract_images_to_pdf_run_button.setEnabled(False)
 
     
     # ------------------- #
@@ -398,11 +396,11 @@ class MainWindow(QMainWindow):
         self.search_save_pdf_label.setText(" 0pages ready to merge")
         self.output_file_label.setText("Output path:")
         self.status_bar_label.setText("")
-        self.extract_pdf_to_images_label.setText("Input path:")
+        self.extract_pdf_to_images_label.setText("Open File:")
         self.select_page_list.clear()
-        self.extract_pdf_to_images_filetype.setCurrentIndex(0)
-        self.extract_pdf_to_images_quality.setCurrentIndex(0)
-        self.extract_pdf_to_images_button.setEnabled(False)
+        self.extract_images_to_pdf_filetype_combo.setCurrentIndex(0)
+        self.extract_images_to_pdf_quality_combo.setCurrentIndex(0)
+        self.extract_images_to_pdf_run_button.setEnabled(False)
 
     #
     # 
@@ -421,8 +419,8 @@ class MainWindow(QMainWindow):
         return self.search_pdf_input_word.text()
     
     def pdf_to_image_button(self):
-        filetype = self.extract_pdf_to_images_filetype.currentIndex()
-        quality = self.extract_pdf_to_images_quality.currentIndex()
+        filetype = self.extract_images_to_pdf_filetype_combo.currentIndex()
+        quality = self.extract_images_to_pdf_quality_combo.currentIndex()
         #
         if filetype == 1:
             file_t = 'jpeg'

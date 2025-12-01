@@ -48,7 +48,7 @@ class MainController(QObject):
         self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
         self._view.join_pdf_save_file_button.clicked.connect(self.merge_pdfs)
         # tab4
-        self._view.extract_pdf_to_images_open_files_button.clicked.connect(self.set_multiple_file_paths)
+        self._view.extract_images_from_pdf_open_file_button.clicked.connect(self.call_selected_tab)
         #
         self._view.extract_pdf_to_images_filetype.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
         self._view.extract_pdf_to_images_quality.currentIndexChanged.connect(self._view.pdf_to_image_button_check)
@@ -94,6 +94,12 @@ class MainController(QObject):
         # tab 4
         if tab_number == 3:
             self.set_file_path()
+            if self.file_path:
+                self._view.extract_images_from_pdf_label.setText(f"Path: {self.file_path}")
+                self._view.extract_images_to_pdf_filetype_combo.setEnabled(True)
+                self._view.extract_images_to_pdf_quality_combo.setEnabled(False)
+                self._view.extract_images_to_pdf_run_button.setEnabled(True)
+
             #test if text
 
         # tab 5
