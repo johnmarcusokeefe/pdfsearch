@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
         self.search_pdf_input_word = QLineEdit()
         self.search_pdf_input_word.setPlaceholderText("enter single word without spaces")
         
-          # Create a QRegExp that matches any character except a space
+        # Create a QRegExp that matches any character except a space
         # The '+' means one or more occurrences of the allowed characters
         regex = QRegularExpression("[^ ]+") 
         
@@ -149,15 +149,15 @@ class MainWindow(QMainWindow):
         # ---------------
         # | Tab 2 layout |
         # ---------------
-        tab2_content = QWidget()
-        tab2_main = QHBoxLayout()
-        tab2_left = QVBoxLayout()
-        tab2_right = QVBoxLayout()
-        tab2_right.setAlignment(Qt.AlignTop) 
+        tab_2_content = QWidget()
+        tab_2_main = QHBoxLayout()
+        tab_2_left = QVBoxLayout()
+        tab_2_right = QVBoxLayout()
+        tab_2_right.setAlignment(Qt.AlignTop) 
 
-        tab2_main.addLayout(tab2_left)
-        tab2_main.addLayout(tab2_right)
-        tab2_content.setLayout(tab2_main)
+        tab_2_main.addLayout(tab_2_left)
+        tab_2_main.addLayout(tab_2_right)
+        tab_2_content.setLayout(tab_2_main)
 
         self.select_page_list = QListWidget()
         self.select_page_list.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -165,58 +165,55 @@ class MainWindow(QMainWindow):
         self.select_page_list.itemSelectionChanged.connect(self.list_select)
         
         self.extract_pages_file_open_button = QPushButton("Open File")
-        #self.extract_pages_file_open_button.clicked.connect(self.open_path_to_extract_pages_button)
         
         self.split_pdf_save_file_button = QPushButton("Extract")
         self.split_pdf_save_file_button.setEnabled(False)
-        #self.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         
-        tab2_left.addWidget(self.select_page_list)
-        tab2_right.addWidget(self.extract_pages_file_open_button, alignment=Qt.AlignTop)
-        tab2_right.addWidget(self.split_pdf_save_file_button, alignment=Qt.AlignTop)
+        tab_2_left.addWidget(self.select_page_list)
+        tab_2_right.addWidget(self.extract_pages_file_open_button, alignment=Qt.AlignTop)
+        tab_2_right.addWidget(self.split_pdf_save_file_button, alignment=Qt.AlignTop)
 
         # ---------------
         # | Tab 3 layout |
         # ---------------
-        tab3_content = QWidget()
-        tab3_main = QHBoxLayout()
-        tab3_left = QVBoxLayout()
-        tab3_right = QVBoxLayout()
-        tab3_right.setAlignment(Qt.AlignTop)
+        tab_3_content = QWidget()
+        tab_3_main = QHBoxLayout()
+        tab_3_left = QVBoxLayout()
+        tab_3_right = QVBoxLayout()
+        tab_3_right.setAlignment(Qt.AlignTop)
 
-        tab3_main.addLayout(tab3_left)
-        tab3_main.addLayout(tab3_right)
-        tab3_content.setLayout(tab3_main)
+        tab_3_main.addLayout(tab_3_left)
+        tab_3_main.addLayout(tab_3_right)
+        tab_3_content.setLayout(tab_3_main)
 
         self.file_list_display = QListWidget()
         self.file_list_display.setEnabled(False)
 
         join_pdf_label = QLabel("Join\\Combine Selected Files:\nChoose: PDF, PNG or PDF")
         self.join_pdf_select_multiple_files = QPushButton("Select Files")
-        #self.join_pdf_select_multiple_files.clicked.connect(self.open_files_to_join_button)
         self.auto_filename = QCheckBox("Auto Filename")
         self.auto_filename.setChecked(False)
         self.join_pdf_save_file_button = QPushButton("Merge Files")
         self.join_pdf_save_file_button.setEnabled(False)
-        #self.join_pdf_save_file_button.clicked.connect(self.save_file_list)
-        tab3_left.addWidget(self.file_list_display)
-        tab3_right.addWidget(join_pdf_label)
-        tab3_right.addWidget(self.join_pdf_select_multiple_files)
-        tab3_right.addWidget(self.auto_filename)
-        tab3_right.addWidget(self.join_pdf_save_file_button)
+
+        tab_3_left.addWidget(self.file_list_display)
+        tab_3_right.addWidget(join_pdf_label)
+        tab_3_right.addWidget(self.join_pdf_select_multiple_files)
+        tab_3_right.addWidget(self.auto_filename)
+        tab_3_right.addWidget(self.join_pdf_save_file_button)
         # ---------------
         # | Tab 4 layout |
         # ---------------
-        tab4_content = QWidget()
-        tab4_main = QHBoxLayout()
-        tab4_left = QVBoxLayout()
+        tab_4_content = QWidget()
+        tab_4_main = QHBoxLayout()
+        tab_4_left = QVBoxLayout()
         
-        tab4_right = QVBoxLayout()
-        tab4_right.setAlignment(Qt.AlignTop)
+        tab_4_right = QVBoxLayout()
+        tab_4_right.setAlignment(Qt.AlignTop)
 
-        tab4_main.addLayout(tab4_left, 3)
-        tab4_main.addLayout(tab4_right, 1)
-        tab4_content.setLayout(tab4_main)
+        tab_4_main.addLayout(tab_4_left, 3)
+        tab_4_main.addLayout(tab_4_right, 1)
+        tab_4_content.setLayout(tab_4_main)
 
         self.extract_images_from_pdf_label = QLabel("PDF to Image:")
         self.extract_images_from_pdf_open_file_button = QPushButton("Open File")
@@ -233,9 +230,9 @@ class MainWindow(QMainWindow):
         self.extract_images_from_pdf_run_button = QPushButton("Extract to Images")
         self.extract_images_from_pdf_run_button.setEnabled(False)
 
-        tab4_left.addWidget(self.extract_images_from_pdf_label)
-        tab4_left.addWidget(self.extract_images_from_pdf_count_label)
-        tab4_left.setAlignment(Qt.AlignTop)
+        tab_4_left.addWidget(self.extract_pdf_to_images_label)
+        tab_4_left.addWidget(self.pdf_to_image_page_count_label)
+        tab_4_left.setAlignment(Qt.AlignTop)
         
         tab4_right.addWidget(self.extract_images_from_pdf_open_file_button)
         #self.extract_pdf_to_images_open_files_button.setFixedSize(QSize(150, 40))
@@ -273,9 +270,9 @@ class MainWindow(QMainWindow):
 
         # Add tabs to main tab widget
         self.tab_widget.addTab(tab_1_widget, "Search")
-        self.tab_widget.addTab(tab2_content, "Extract Pages")
-        self.tab_widget.addTab(tab3_content, "Append Files")
-        self.tab_widget.addTab(tab4_content, "PDF -> Image")
+        self.tab_widget.addTab(tab_2_content, "Extract Pages")
+        self.tab_widget.addTab(tab_3_content, "Append Files")
+        self.tab_widget.addTab(tab_4_content, "PDF -> Image")
         self.tab_widget.addTab(tab_5_content, "PDF -> Text")
         
         self.tab_widget.setFixedHeight(250)
