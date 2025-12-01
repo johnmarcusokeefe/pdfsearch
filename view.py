@@ -348,25 +348,7 @@ class MainWindow(QMainWindow):
             self.file_size_label.setText(f"Files Size: {self.file_size} MB")
             #
             # if pages found returns a count otherwise 0v
-            #self.page_count = self.is_text_plus_num_pages
             self.terminal_log.append(f"Selected file: {file_path}")
-    #
-    # tab 4
-    def open_file_convert_pdf_to_image(self):
-        #file_path = self.filedialog.open_file_dialog()
-        # self.extract_pdf_to_images_label.setText(f"Pdf to Image file path: {file_path}")
-        #self.extract_pdf_to_images_filetype.setEnabled(True)
-        self.extract_images_from_pdf_quality_combo.setEnabled(True)
-        # num_pages = self.ctl.count_pdf_pages(file_path)
-        # self.pdf_to_image_page_count_label.setText(f"Pages to convert: {num_pages}")
-        # self.terminal_log.setText(f"Filepath: {file_path} loaded with {num_pages} pages")
-        #self.extract_pdf_to_images_button.setText(f"Pages to convert: {num_pages}")
-   
-    # tab 5
-    def convert_pdf_to_word(self):
-        word_output = f"{self.file_path}.docx"
-        #MainController.convert_pdf_to_word(word_output, self.file_path)
- 
     
     # ------------------- #
     #  reset all values    #
@@ -382,22 +364,6 @@ class MainWindow(QMainWindow):
         self.extract_images_from_pdf_filetype_combo.setCurrentIndex(0)
         self.extract_images_from_pdf_quality_combo.setCurrentIndex(0)
         self.extract_images_from_pdf_run_button.setEnabled(False)
-
-    #
-    # 
-    #
-    def get_output_filename_flag(self):
-        if self.auto_filename.isChecked():
-            return True
-        else:
-            return False
-  
-    
-    def get_level(self):
-        return self.search_pdf_combo.currentText()
-    
-    def get_search_word(self):
-        return self.search_pdf_input_word.text()
     
     def pdf_to_image_button(self):
         filetype = self.extract_images_from_pdf_filetype_combo.currentIndex()

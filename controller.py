@@ -84,7 +84,7 @@ class MainController(QObject):
             print("tab 2")
         # tab 3
         if tab_number == 2:
-            flag = self._view.get_output_filename_flag()
+            flag = self._view.auto_filename.isChecked()
             file_name = self._fileview.user_filename_input_dialog(flag)
             if file_name != "":
                 self.merge_pdfs
@@ -98,9 +98,6 @@ class MainController(QObject):
                 self._view.extract_images_from_pdf_label.setText(f"Path: {self.file_path}")
                 self._view.extract_images_from_pdf_filetype_combo.setEnabled(True)
                 self._view.extract_images_from_pdf_quality_combo.setEnabled(True)
-
-            #test if text
-
         # tab 5
         if tab_number == 4:
             print("tab 5")
@@ -122,6 +119,8 @@ class MainController(QObject):
         file_path = self._fileview.open_file_dialog()
         if file_path:
             self.file_path = file_path
+        else:
+            self._view
             
         # update feedback labels
         print("open file path",self.file_path)
@@ -188,9 +187,9 @@ class MainController(QObject):
     #
     def search_pdf(self):
         # get the input word from the input widget
-        search_word = self._view.get_search_word()
+        search_word = self._view.search_pdf_input_word.text()
         # get an interger value to set levenshtein level
-        level = self._view.get_level()
+        level = self._view.search_pdf_combo.currentText()
         self.file_list = self.process_pdf_file_for_search(self.file_path, search_word, level)
         if len(self.file_list) == 0:
             self._view.terminal_log.append("search result empty")
@@ -211,7 +210,6 @@ class MainController(QObject):
             else:
                 #self.page_count_label.setText(f"Page count: {num_pages}")
                 return num_pages
-
     #       
     # subfunction of pdf_search. searches one string
     #
