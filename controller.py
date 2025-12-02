@@ -11,7 +11,7 @@ from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import Signal, QObject
+from PySide6.QtCore import QObject
 # local files
 from view import MainWindow, FeedbackWindow
 from pypdf import PdfReader, PdfWriter
