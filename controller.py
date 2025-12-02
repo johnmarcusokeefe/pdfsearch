@@ -2,7 +2,7 @@
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
 
-import sys, os, mimetypes, img2pdf, io, warnings
+import sys, os, mimetypes, img2pdf, io, warnings, re
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 from pypdf import *
@@ -138,7 +138,7 @@ class MainController(QObject):
         if file_path:
             self.file_path = file_path
         else:
-            self._view
+            print("no file path set")
             
         # update feedback labels
         print("open file path",self.file_path)
@@ -387,9 +387,27 @@ class MainController(QObject):
     def pdf_to_image(self):
         dpi_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
         fmt_in = self._view.extract_images_from_pdf_quality_combo.currentText()
+
+        pattern = r'\d+'
+        
+        # Search for the pattern in the text
+        match = re.search(pattern, dpi_in)
+        print("match", match)
+        if match:
+            first_integer_str = match.group()
+            # Optionally, convert the matched string to an integer
+            first_integer = int(first_integer_str)
+            print(f"The first occurrence of an integer as an int: {first_integer}")
+        else:
+            print("No integer found in the text.")
+            first_integer = 150
+
+        
+        print("args", dpi_in, fmt_in)
         brightness=0.99
         # Store Pdf with convert_from_path function
-        images = convert_from_path(self.file_path, dpi=dpi_in, fmt=fmt_in)
+        print(self.file_path)
+        images = convert_from_path(self.file_path, dpi=first_integer, fmt=fmt_in)
 
         for i in range(len(images)):
             # Save pages as images in the pdf
