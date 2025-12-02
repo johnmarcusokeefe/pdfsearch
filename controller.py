@@ -385,29 +385,28 @@ class MainController(QObject):
     #
 
     def pdf_to_image(self):
-        dpi_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
-        fmt_in = self._view.extract_images_from_pdf_quality_combo.currentText()
-
+        fmt_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
+        dpi_in = self._view.extract_images_from_pdf_quality_combo.currentText()
+        # pattern returns all digits. example "medium: 300pdi"
         pattern = r'\d+'
-        
         # Search for the pattern in the text
         match = re.search(pattern, dpi_in)
         print("match", match)
         if match:
-            first_integer_str = match.group()
+            dpi_str = match.group()
             # Optionally, convert the matched string to an integer
-            first_integer = int(first_integer_str)
-            print(f"The first occurrence of an integer as an int: {first_integer}")
+            dpi_int = int(dpi_str)
+            print(f"The first occurrence of an integer as an int: {dpi_int}")
         else:
             print("No integer found in the text.")
-            first_integer = 150
+            dpi_int = 150
 
         
         print("args", dpi_in, fmt_in)
         brightness=0.99
         # Store Pdf with convert_from_path function
         print(self.file_path)
-        images = convert_from_path(self.file_path, dpi=first_integer, fmt=fmt_in)
+        images = convert_from_path(self.file_path, dpi=dpi_int, fmt=fmt_in)
 
         for i in range(len(images)):
             # Save pages as images in the pdf
