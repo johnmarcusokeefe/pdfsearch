@@ -81,9 +81,9 @@ class MainWindow(QMainWindow):
         self.open_output_log_button = QPushButton("open log")
         self.open_output_log_button.clicked.connect(self.open_log_window)
 
-        # -----------------------
+        # -------------------------
         # | tab | tab | tab | tab |
-        # -----------------------
+        # -------------------------
         self.tab_widget = QTabWidget()
 
         # ---------------
@@ -198,6 +198,7 @@ class MainWindow(QMainWindow):
         tab_3_right.addWidget(self.join_pdf_select_multiple_files)
         tab_3_right.addWidget(self.auto_filename)
         tab_3_right.addWidget(self.join_pdf_save_file_button)
+
         # ---------------
         # | Tab 4 layout |
         # ---------------
@@ -232,10 +233,10 @@ class MainWindow(QMainWindow):
         tab_4_left.setAlignment(Qt.AlignTop)
         
         tab_4_right.addWidget(self.extract_images_from_pdf_open_file_button)
-        #self.extract_pdf_to_images_open_files_button.setFixedSize(QSize(150, 40))
         tab_4_right.addWidget(self.extract_images_from_pdf_filetype_combo)
         tab_4_right.addWidget(self.extract_images_from_pdf_quality_combo)
         tab_4_right.addWidget(self.extract_images_from_pdf_run_button)
+
         # ---------------
         # | Tab 5 layout |
         # ---------------
@@ -265,6 +266,9 @@ class MainWindow(QMainWindow):
         tab_5_right.addWidget(self.extract_pdf_to_word_content_button)
         tab_5_right.addWidget(self.extract_pdf_to_text_button)
 
+        # ---------------
+        # | Tab 6 layout |
+        # ---------------
         # Add tabs to main tab widget
         self.tab_widget.addTab(tab_1_widget, "Search")
         self.tab_widget.addTab(tab_2_content, "Extract Pages")
@@ -272,7 +276,7 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(tab_4_content, "PDF -> Image")
         self.tab_widget.addTab(tab_5_content, "PDF -> Text")
         
-        self.tab_widget.setFixedHeight(250)
+        self.tab_widget.setFixedHeight(300)
 
         layout.addWidget(self.tab_widget, alignment=Qt.AlignTop)
 
@@ -297,7 +301,6 @@ class MainWindow(QMainWindow):
 
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
-
     #
     # tab 2
     #
@@ -314,6 +317,7 @@ class MainWindow(QMainWindow):
         if self.terminal_log.isVisible():
             self.terminal_log.hide()
             # do dynamically
+            print("tab widget height", self.tab_widget.height())
             self.setFixedHeight(self.height()-314)
         else:
             self.setFixedHeight(self.height()+314)

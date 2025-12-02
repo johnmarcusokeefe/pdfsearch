@@ -2,7 +2,7 @@
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
 
-import sys, os, mimetypes, img2pdf, io, warnings
+import sys, os, mimetypes, img2pdf, io, warnings, re
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 from pypdf import *
@@ -62,16 +62,16 @@ class MainController(QObject):
         self._view.tab_widget.currentChanged.connect(self.tab_change)
 
     # ------------------- #
-    #  reset all values   #
+    #  reset all values    #
     # --------------------#
     def tab_change(self):
+        print("new tab selected",self._view.tab_widget.currentIndex()+1)
         print("new tab selected",self._view.tab_widget.currentIndex()+1)
         self._view.file_path = ""
         self._view.search_found_label.setText("Search Pending")
         self._view.search_save_pdf_label.setText("0 pages ready to merge")
         self._view.output_file_label.setText("Output path:")
         self._view.status_bar_label.setText("")
-        #self.extract_images_from_pdf_label.setText("Open File:")
         self._view.select_page_list.clear()
         self._view.extract_images_from_pdf_filetype_combo.setCurrentIndex(0)
         self._view.extract_images_from_pdf_quality_combo.setCurrentIndex(0)
@@ -139,7 +139,7 @@ class MainController(QObject):
         if file_path:
             self.file_path = file_path
         else:
-            self._view
+            print("no file path set")
             
         # update feedback labels
         print("open file path",self.file_path)
@@ -380,17 +380,32 @@ class MainController(QObject):
             self._view.extract_images_from_pdf_run_button.setEnabled(False)
         if self.file_path == "":
             self._view.extract_images_from_pdf_run_button.setEnabled(False)
-
     #
     # pdf to image converter
     #
-
     def pdf_to_image(self):
-        dpi_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
-        fmt_in = self._view.extract_images_from_pdf_quality_combo.currentText()
+        fmt_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
+        dpi_in = self._view.extract_images_from_pdf_quality_combo.currentText()
+        # pattern returns all digits. example "medium: 300pdi"
+        pattern = r'\d+'
+        # Search for the pattern in the text
+        match = re.search(pattern, dpi_in)
+        print("match", match)
+        if match:
+            dpi_str = match.group()
+            # Optionally, convert the matched string to an integer
+            dpi_int = int(dpi_str)
+            print(f"The first occurrence of an integer as an int: {dpi_int}")
+        else:
+            print("No integer found in the text.")
+            dpi_int = 150
+
+        
+        print("args", dpi_in, fmt_in)
         brightness=0.99
         # Store Pdf with convert_from_path function
-        images = convert_from_path(self.file_path, dpi=dpi_in, fmt=fmt_in)
+        print(self.file_path)
+        images = convert_from_path(self.file_path, dpi=dpi_int, fmt=fmt_in)
 
         for i in range(len(images)):
             # Save pages as images in the pdf
