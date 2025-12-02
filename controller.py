@@ -5,7 +5,6 @@
 import sys, os, mimetypes, img2pdf, io, warnings, re
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
-from pypdf import *
 import Levenshtein as levenshtein
 import ocrmypdf
 from datetime import datetime
