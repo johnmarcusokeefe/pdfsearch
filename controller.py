@@ -70,7 +70,6 @@ class MainController(QObject):
         self._view.search_save_pdf_label.setText("0 pages ready to merge")
         self._view.output_file_label.setText("Output path:")
         self._view.status_bar_label.setText("")
-        #self.extract_images_from_pdf_label.setText("Open File:")
         self._view.select_page_list.clear()
         self._view.extract_images_from_pdf_filetype_combo.setCurrentIndex(0)
         self._view.extract_images_from_pdf_quality_combo.setCurrentIndex(0)
