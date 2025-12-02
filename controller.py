@@ -379,11 +379,9 @@ class MainController(QObject):
             self._view.extract_images_from_pdf_run_button.setEnabled(False)
         if self.file_path == "":
             self._view.extract_images_from_pdf_run_button.setEnabled(False)
-
     #
     # pdf to image converter
     #
-
     def pdf_to_image(self):
         fmt_in = self._view.extract_images_from_pdf_filetype_combo.currentText()
         dpi_in = self._view.extract_images_from_pdf_quality_combo.currentText()

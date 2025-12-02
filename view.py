@@ -81,9 +81,9 @@ class MainWindow(QMainWindow):
         self.open_output_log_button = QPushButton("open log")
         self.open_output_log_button.clicked.connect(self.open_log_window)
 
-        # -----------------------
+        # -------------------------
         # | tab | tab | tab | tab |
-        # -----------------------
+        # -------------------------
         self.tab_widget = QTabWidget()
 
         # ---------------
@@ -198,7 +198,7 @@ class MainWindow(QMainWindow):
         tab_3_right.addWidget(self.join_pdf_select_multiple_files)
         tab_3_right.addWidget(self.auto_filename)
         tab_3_right.addWidget(self.join_pdf_save_file_button)
-        
+
         # ---------------
         # | Tab 4 layout |
         # ---------------
@@ -269,7 +269,6 @@ class MainWindow(QMainWindow):
         # ---------------
         # | Tab 6 layout |
         # ---------------
-
         # Add tabs to main tab widget
         self.tab_widget.addTab(tab_1_widget, "Search")
         self.tab_widget.addTab(tab_2_content, "Extract Pages")
@@ -302,7 +301,6 @@ class MainWindow(QMainWindow):
 
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
-
     #
     # tab 2
     #
