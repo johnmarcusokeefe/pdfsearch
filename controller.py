@@ -353,7 +353,7 @@ class MainController(QObject):
             file_name = self._fileview.user_filename_input_dialog()
         else:
             ts = datetime.now().timestamp()
-            file_name = "merge_pdf"+str(ts)+".pdf"
+            file_name = "output/merge_pdf"+str(ts)+".pdf"
         #
         if file_name:
             # test if has pdf extension
