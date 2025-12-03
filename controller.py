@@ -92,7 +92,7 @@ class MainController(QObject):
                 self._view.search_pdf_button.setEnabled(False)
                 self._view.search_pdf_combo.setEnabled(False)
             #
-            self._view.update_labels("search", self.file_path)
+            #self._view.update_labels("search", self.file_path)
         # tab 2 selected
         if tab_number == 1:
             self.set_file_path()
@@ -118,9 +118,12 @@ class MainController(QObject):
         if tab_number == 4:
             print("tab 5")
             self.set_file_path()
+            self._view.extract_pdf_content_label.setText(f"Extract PDF Filepath: {self.file_path}")
             # test if text
-            if self.check_pdf() == 0:
-                self.ocr_file(self.file_path) 
+            num_pages = self.check_pdf()
+            self.set_status_bar(f"{num_pages} pages found with text")
+            if num_pages == 0:
+                self.ocr_file() 
                 self._view.extract_pdf_to_text_button.setEnabled(True)
                 self._view.extract_pdf_to_word_content_button.setEnabled(True)
             else:
@@ -135,19 +138,19 @@ class MainController(QObject):
         file_path = self._fileview.open_file_dialog()
         if file_path:
             self.file_path = file_path
+            self.set_status_bar("file path set")
         else:
             print("no file path set")
             
         # update feedback labels
         print("open file path",self.file_path)
-    #
-    # use a feedback window to confirm files added
+ 
     #
     def set_multiple_file_paths(self):
         file_list_in = []
         files = self._fileview.open_multiple_files_dialog()
         if len(files) > 1:
-            self._view.status_bar_label.setText("files selected")    
+            self.set_status_bar("multiple file paths set")    
             self._view.join_pdf_save_file_button.setEnabled(True)
             for path in files:
                 file_list_in.append(path)
@@ -181,8 +184,9 @@ class MainController(QObject):
             for page in range(page_count):
                 self._view.select_page_list.addItem(str(page))
             self._view.select_page_list.setEnabled(True)
+            self.set_status_bar("pages selected")
         else:
-            self.status_bar_label.setText("file selection requires more than one page")
+            self.set_status_bar("file selection requires more than one page")
             self.split_pdf_save_file_button.setEnabled(False)
     #
     def extract_pages(self):
@@ -335,7 +339,8 @@ class MainController(QObject):
         file_list = self.file_list
         self._view.status_bar_label.setText("merging pdf")
         # filename needs to be created for merged files
-        file_name = "text"
+        flag = 0
+        file_name = self._fileview.user_filename_input_dialog(flag)
         # test if has pdf extension
         if pdf_ext.lower() in file_name.lower():
             output_filename = file_name
@@ -352,7 +357,7 @@ class MainController(QObject):
             print(mime_type)
             # tests image type and converts
             if(mime_type == "image/png" or mime_type == "image/jpeg" or mime_type == "image/jpg"):
-                converted_path = self.image_to_pdf(self, path)
+                converted_path = self.image_to_pdf(path)
                 merger.append(converted_path)
             else:
                 merger.append(path)
@@ -457,6 +462,7 @@ class MainController(QObject):
             cv.close()
             print(f"Successfully converted '{self.file_path}' to '{docx_file_path}'")
             self._view.status_bar_label.setText("word file created")
+            
         except Exception as e:
             print(f"Error converting PDF to Word: {e}")
     #
@@ -501,7 +507,11 @@ class MainController(QObject):
             self._view.terminal_log.append("no files in list save_pdf")
             
         self._view.save_pdf_button.setEnabled(False)
-
+    #
+    # set status bar message
+    #
+    def set_status_bar(self, message):
+        self._view.status_bar_label.setText(message) 
 
 if __name__ == "__main__":
 
