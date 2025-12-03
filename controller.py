@@ -38,7 +38,7 @@ class MainController(QObject):
         #tab1
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
-        self._view.ocr_pdf_button.clicked.connect(self.ocr_file)
+        self._view.ocr_pdf_button.clicked.connect(self.ocr_pdf_file)
         self._view.save_pdf_button.clicked.connect(self.save_pdf_from_search)
         # tab2
         self._view.extract_pages_file_open_button.clicked.connect(self.call_selected_tab)
@@ -123,7 +123,7 @@ class MainController(QObject):
             num_pages = self.check_pdf()
             self.set_status_bar(f"{num_pages} pages found with text")
             if num_pages == 0:
-                self.ocr_file() 
+                self.ocr_pdf_file() 
                 self._view.extract_pdf_to_text_button.setEnabled(True)
                 self._view.extract_pdf_to_word_content_button.setEnabled(True)
             else:
@@ -188,6 +188,8 @@ class MainController(QObject):
         else:
             self.set_status_bar("file selection requires more than one page")
             self.split_pdf_save_file_button.setEnabled(False)
+    #
+    #
     #
     def extract_pages(self):
         page_list = []
@@ -285,7 +287,7 @@ class MainController(QObject):
     #
     # create a text searchable document
     #
-    def ocr_file(self):
+    def ocr_pdf_file(self):
         """
         Adds an OCR text layer to a scanned PDF, making it searchable.
         """
@@ -299,7 +301,6 @@ class MainController(QObject):
         #set buttons true
         self._view.search_pdf_button.setEnabled(True)
         self._view.search_pdf_combo.setEnabled(True)
-        
     #
     # extract pages
     #
@@ -370,8 +371,7 @@ class MainController(QObject):
         merger.close()
         self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
         print(f"PDFs merged successfully into {output_filename}")
-    
-     #
+    #
     # check if image conversion buttons are selected
     #
     def extract_images_from_pdf_button_check(self):
