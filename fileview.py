@@ -33,6 +33,7 @@ class FileDialogue:
     #
     def open_multiple_files_dialog(self):
         file_list = []
+
         self.last_path_opened = self.load_text()
         file_list, _ = QFileDialog.getOpenFileNames(
             None,
@@ -47,20 +48,15 @@ class FileDialogue:
     #
     # cut and paste example to be adapted
     # todo: separate the get name from the createfilename. create filename in control
-    def user_filename_input_dialog(self, flag):
+    def user_filename_input_dialog(self):
         # Open a QFileDialog for saving a file
-
-        current_timestamp = time.time()
-        if flag == 1:
-            filename = f"output/merge_{len(self.file_list)}_pages_{current_timestamp}.pdf"
-        else:
-            filename, _ = QFileDialog.getSaveFileName(
-                None,
-                "Save File",
-                "output",  # Initial directory (empty string for default)
-                "PDF Files (*.pdf);;All Files (*)" # File filters
-            )
-            print("return filename", filename)
+        filename, _ = QFileDialog.getSaveFileName(
+            None,
+            "Save File",
+            "output",  # Initial directory (empty string for default)
+            "PDF Files (*.pdf);;All Files (*)" # File filters
+        )
+        print("return filename", filename)
         return filename
     #
     # get text file data

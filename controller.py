@@ -2,7 +2,7 @@
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
 
-import sys, os, mimetypes, img2pdf, io, warnings, re
+import sys, os, mimetypes, img2pdf, io, warnings, re, glob
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 import Levenshtein as levenshtein
@@ -44,8 +44,9 @@ class MainController(QObject):
         self._view.extract_pages_file_open_button.clicked.connect(self.call_selected_tab)
         self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
         # tab3
-        self._view.join_pdf_select_multiple_files.clicked.connect(self.set_multiple_file_paths)
+        self._view.join_pdf_select_multiple_files.clicked.connect(self.call_selected_tab)
         self._view.join_pdf_save_file_button.clicked.connect(self.merge_pdfs)
+        self._view.join_images_save_file_button.clicked.connect(self.merge_images_to_pdf)
         # tab4
         self._view.extract_images_from_pdf_open_file_button.clicked.connect(self.call_selected_tab)
         #
@@ -100,13 +101,20 @@ class MainController(QObject):
             print("tab 2")
         # tab 3
         if tab_number == 2:
-            flag = self._view.auto_filename.isChecked()
-            file_name = self._fileview.user_filename_input_dialog(flag)
-            if file_name != "":
-                self.merge_pdfs
-            else:
-                print("no filename provided")
             print("tab 3")
+
+            self.set_multiple_file_paths()
+            # check mime type to enable buttons
+            mime_type = mimetypes.guess_type(self.file_list[0])[0]
+            print(mime_type)
+            # # tests image type and converts
+            if mime_type  == "image/jpeg" :
+                self._view.join_images_save_file_button.setEnabled(True)
+                self._view.join_pdf_save_file_button.setEnabled(False)
+            if mime_type == "application/pdf":
+                self._view.join_pdf_save_file_button.setEnabled(True)
+                self._view.join_images_save_file_button.setEnabled(False)
+           
         # tab 4
         if tab_number == 3:
             self.set_file_path()
@@ -160,6 +168,7 @@ class MainController(QObject):
             self.dialog = FeedbackWindow(file_list_in) # Pass self as parent for WindowModal
             if self.dialog.exec() == 1: # Shows the dialog modally
                 self._view.terminal_log.append(f"multiple files selected")
+                self._view.file_list_display.clear()
                 i = 1
                 for file in file_list_in:
                     self._view.file_list_display.addItem(f"{i}: {os.path.basename(file)}")
@@ -193,7 +202,6 @@ class MainController(QObject):
     #
     def extract_pages(self):
         page_list = []
-        #print(f"Selected Pages: {self.page_number_input.selectedIndexes()}")
         selection_model = self._view.select_page_list.selectionModel()
         # Get the selected indexes
         selected_indexes = selection_model.selectedIndexes()
@@ -238,7 +246,6 @@ class MainController(QObject):
         l_ratio = 0
         for word in text.split():
             l_ratio = levenshtein.ratio(search_word.lower(), word.lower())
-            #print(type(l_ratio))
             if l_ratio > float(level):
                 prt_string = f"word matched: {word}"
                 self._view.terminal_log.append(prt_string)
@@ -338,39 +345,38 @@ class MainController(QObject):
         
         pdf_ext = ".pdf"
         file_list = self.file_list
+        flag = self._view.auto_filename.isChecked()
         self._view.status_bar_label.setText("merging pdf")
         # filename needs to be created for merged files
-        flag = 0
-        file_name = self._fileview.user_filename_input_dialog(flag)
-        # test if has pdf extension
-        if pdf_ext.lower() in file_name.lower():
-            output_filename = file_name
+        
+        if flag == 0:
+            file_name = self._fileview.user_filename_input_dialog()
         else:
-            output_filename = file_name+pdf_ext
-        print("call merge pdfs")
-        """
-        Merges a list of PDF files into a single output PDF.
-        """
-        merger = PdfWriter()
-        for path in file_list:
-            print("merge pdf path: ",path)
-            mime_type = mimetypes.guess_type(path)[0]
-            print(mime_type)
-            # tests image type and converts
-            if(mime_type == "image/png" or mime_type == "image/jpeg" or mime_type == "image/jpg"):
-                converted_path = self.image_to_pdf(path)
-                merger.append(converted_path)
+            file_name = "createfilename"
+        #
+        if file_name:
+            # test if has pdf extension
+            if pdf_ext.lower() in file_name.lower():
+                output_filename = file_name
             else:
-                merger.append(path)
-            #    
-            try:
-                with open(output_filename, "wb") as output_file:
-                    merger.write(output_file)
-            except Exception as e:
-                print(f"Error saving file: {e}")
-        merger.close()
-        self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
-        print(f"PDFs merged successfully into {output_filename}")
+                output_filename = file_name+pdf_ext
+            print("call merge pdfs")
+            """
+            Merges a list of PDF files into a single output PDF.
+            """
+            merger = PdfWriter()
+            for path in file_list:
+                print("merge pdf path: ",path)    
+                try:
+                    with open(output_filename, "wb") as output_file:
+                        merger.write(output_file)
+                except Exception as e:
+                    print(f"Error saving file: {e}")
+            merger.close()
+            self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
+            print(f"PDFs merged successfully into {output_filename}")
+        else:
+            self.set_status_bar("no file name supplied")
     #
     # check if image conversion buttons are selected
     #
@@ -420,28 +426,19 @@ class MainController(QObject):
         return "output/images", len(images)
     #
     #
-    #
-    def image_to_pdf(self, img_path):
-        pdf_path = img_path+".pdf"
-        try:
-        # Open the image using Pillow (PIL)
-            image = Image.open(img_path)
-        # Convert the image to PDF bytes using img2pdf
-            bytes_to_merge = img2pdf.convert(image.filename)
-        # Write the PDF bytes to a file
-            # with open(pdf_path, "wb") as f:
-            #     f.write(pdf_bytes)
-            # print(f"Successfully converted '{img_path}' to '{pdf_path}'")
-        except FileNotFoundError:
-            print(f"Error: Image file not found at '{img_path}'")
-        except Exception as e:
-            print(f"An error occurred: {e}")
-        finally:
-            # Close the image if it was opened successfully
-            if 'image' in locals() and image:
-                image.close()
-            # one page
-            return PdfReader(io.BytesIO(bytes_to_merge))
+    #      
+    def merge_images_to_pdf(self):
+
+        flag = self._view.auto_filename.isChecked()
+        self._fileview.user_filename_input_dialog(flag)
+        output_path = "output_lossless.pdf"
+
+        if not self.file_list:
+            print("No JPEG images found.")
+        else:
+            with open(output_path, "wb") as f:
+                f.write(img2pdf.convert(self.file_list))
+            print(f"Successfully created lossless PDF: {output_path}")
     #
     # convert pdf to word document 
     #

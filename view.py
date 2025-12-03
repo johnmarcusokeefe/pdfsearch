@@ -190,14 +190,18 @@ class MainWindow(QMainWindow):
         self.join_pdf_select_multiple_files = QPushButton("Select Files")
         self.auto_filename = QCheckBox("Auto Filename")
         self.auto_filename.setChecked(False)
-        self.join_pdf_save_file_button = QPushButton("Merge Files")
+        self.join_pdf_save_file_button = QPushButton("Merge PDF Files")
         self.join_pdf_save_file_button.setEnabled(False)
+
+        self.join_images_save_file_button = QPushButton("Merge Images to PDF")
+        self.join_images_save_file_button.setEnabled(False)
 
         tab_3_left.addWidget(self.file_list_display)
         tab_3_right.addWidget(join_pdf_label)
         tab_3_right.addWidget(self.join_pdf_select_multiple_files)
         tab_3_right.addWidget(self.auto_filename)
         tab_3_right.addWidget(self.join_pdf_save_file_button)
+        tab_3_right.addWidget(self.join_images_save_file_button)
 
         # ---------------
         # | Tab 4 layout |
