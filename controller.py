@@ -346,13 +346,12 @@ class MainController(QObject):
         pdf_ext = ".pdf"
         file_list = self.file_list
         flag = self._view.auto_filename.isChecked()
-        self._view.status_bar_label.setText("merging pdf")
+        self._view.status_bar_label.setText("merging pdf files")
         # filename needs to be created for merged files
-        
         if flag == 0:
             file_name = self._fileview.user_filename_input_dialog()
         else:
-            file_name = "createfilename"
+            file_name = "output/autocreate"
         #
         if file_name:
             # test if has pdf extension
@@ -407,14 +406,12 @@ class MainController(QObject):
         else:
             print("No integer found in the text.")
             dpi_int = 150
-
         
         print("args", dpi_in, fmt_in)
         brightness=0.99
         # Store Pdf with convert_from_path function
         print(self.file_path)
         images = convert_from_path(self.file_path, dpi=dpi_int, fmt=fmt_in)
-
         for i in range(len(images)):
             # Save pages as images in the pdf
             enhancer = ImageEnhance.Brightness(images[i])
@@ -430,7 +427,7 @@ class MainController(QObject):
     def merge_images_to_pdf(self):
 
         flag = self._view.auto_filename.isChecked()
-        self._fileview.user_filename_input_dialog(flag)
+        self._fileview.user_filename_input_dialog()
         output_path = "output_lossless.pdf"
 
         if not self.file_list:
@@ -443,7 +440,6 @@ class MainController(QObject):
     # convert pdf to word document 
     #
     def convert_pdf_to_word(self):
-        
         """
         Converts a PDF file to a DOCX (Word) document.
 
@@ -459,7 +455,6 @@ class MainController(QObject):
             cv.close()
             print(f"Successfully converted '{self.file_path}' to '{docx_file_path}'")
             self._view.status_bar_label.setText("word file created")
-            
         except Exception as e:
             print(f"Error converting PDF to Word: {e}")
     #

@@ -56,7 +56,6 @@ class FileDialogue:
             "output",  # Initial directory (empty string for default)
             "PDF Files (*.pdf);;All Files (*)" # File filters
         )
-        print("return filename", filename)
         return filename
     #
     # get text file data
