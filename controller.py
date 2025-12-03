@@ -224,7 +224,7 @@ class MainController(QObject):
             self._view.terminal_log.append("search result empty")
         self._view.search_save_pdf_label.setText(f"{len(self.file_list)} pages ready to merge")
     #   
-    # returns number of text searchable pages
+    # returns number of text searchable pages or false if requires ocr
     #
     def check_pdf(self):   
         # You can now open and process the file content
@@ -364,14 +364,18 @@ class MainController(QObject):
             Merges a list of PDF files into a single output PDF.
             """
             merger = PdfWriter()
-            for path in file_list:
-                print("merge pdf path: ",path)    
+
+            for pdfs in file_list:
+
                 try:
-                    with open(output_filename, "wb") as output_file:
-                        merger.write(output_file)
+                    for pdf in pdfs:
+                        merger.append(pdf) 
+            
                 except Exception as e:
                     print(f"Error saving file: {e}")
-            merger.close()
+            merger.write("output/"+output_filename)
+            merger.close() 
+        
             self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
             print(f"PDFs merged successfully into {output_filename}")
         else:

@@ -32,6 +32,7 @@ class FileDialogue:
     # return file list
     #
     def open_multiple_files_dialog(self):
+
         file_list = []
 
         self.last_path_opened = self.load_text()
