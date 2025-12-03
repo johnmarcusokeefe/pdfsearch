@@ -2,7 +2,7 @@
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
 
-import sys, os, mimetypes, img2pdf, io, warnings, re, glob
+import sys, os, mimetypes, img2pdf, warnings, re
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 import Levenshtein as levenshtein
@@ -15,6 +15,7 @@ from PySide6.QtCore import QObject
 # local files
 from view import MainWindow, FeedbackWindow
 from pypdf import PdfReader, PdfWriter
+from datetime import datetime
 
 from fileview import FileDialogue
 #
@@ -351,7 +352,8 @@ class MainController(QObject):
         if flag == 0:
             file_name = self._fileview.user_filename_input_dialog()
         else:
-            file_name = "output/autocreate"
+            ts = datetime.now().timestamp()
+            file_name = "merge_pdf"+str(ts)+".pdf"
         #
         if file_name:
             # test if has pdf extension
@@ -365,16 +367,20 @@ class MainController(QObject):
             """
             merger = PdfWriter()
 
-            for pdfs in file_list:
+            try:
+                for pdf in file_list:
+                    with open(pdf, 'rb') as pdf_file:
+                        merger.append(pdf_file) 
 
-                try:
-                    for pdf in pdfs:
-                        merger.append(pdf) 
+                    with open(output_filename, 'wb') as output_file:
+                        merger.write(output_file)
+
+                merger.close() 
+        
+            except Exception as e:
+                print(f"Error saving file: {e}")
+
             
-                except Exception as e:
-                    print(f"Error saving file: {e}")
-            merger.write("output/"+output_filename)
-            merger.close() 
         
             self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
             print(f"PDFs merged successfully into {output_filename}")
@@ -431,8 +437,11 @@ class MainController(QObject):
     def merge_images_to_pdf(self):
 
         flag = self._view.auto_filename.isChecked()
-        self._fileview.user_filename_input_dialog()
-        output_path = "output_lossless.pdf"
+        if flag == 0:
+            output_path = self._fileview.user_filename_input_dialog()          
+        else:
+            ts = datetime.now().timestamp()
+            output_path = "output/image_to_pdf"+str(ts)+".pdf"
 
         if not self.file_list:
             print("No JPEG images found.")
