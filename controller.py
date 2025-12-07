@@ -2,21 +2,19 @@
 # mac: source pdfsearch/bin/activate
 # windows: venv\Scripts\activate.bat
 
-import sys, os, mimetypes, img2pdf, warnings, re
+import sys, os, mimetypes, img2pdf, warnings, re, ocrmypdf, asyncio
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 import Levenshtein as levenshtein
-import ocrmypdf
 from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
+from pypdf import PdfReader, PdfWriter
+#gui
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QObject
 # local files
 from view import MainWindow, FeedbackWindow
-from pypdf import PdfReader, PdfWriter
-from datetime import datetime
-
 from fileview import FileDialogue
 #
 # Subclass QMainWindow to customize your application's main window
@@ -66,15 +64,19 @@ class MainController(QObject):
     # --------------------#
     def tab_change(self):
         print("new tab selected",self._view.tab_widget.currentIndex()+1)
-        self._view.file_path = ""
+        self.file_path = ""
+        self.file_list = []
         self._view.search_found_label.setText("Search Pending")
         self._view.search_save_pdf_label.setText("0 pages ready to merge")
         self._view.output_file_label.setText("Output path:")
-        self._view.status_bar_label.setText("")
+        self.set_status_bar("")
+        self._view.join_pdf_select_multiple_files.setText("Select Files")
         self._view.select_page_list.clear()
         self._view.extract_images_from_pdf_filetype_combo.setCurrentIndex(0)
         self._view.extract_images_from_pdf_quality_combo.setCurrentIndex(0)
         self._view.extract_images_from_pdf_run_button.setEnabled(False)
+        self._view.file_list_display.clear()
+        print("file variables", self.file_path, self.file_list)
     #
     # process based on selected tab
     #
@@ -84,15 +86,18 @@ class MainController(QObject):
         print("call_selected_tab method", tab_number + 1)
         if tab_number == 0:
             self.set_file_path()
+            self._view.search_open_file_label.setText(f"filepath: {self.file_path}")
             is_searchable = self.check_pdf()
             print("search tab")
             if is_searchable > 0:
                 self._view.search_pdf_button.setEnabled(True)
                 self._view.search_pdf_combo.setEnabled(True)
+                self.set_status_bar("file ready for search")
             else:
                 self._view.ocr_pdf_button.setEnabled(True)
                 self._view.search_pdf_button.setEnabled(False)
                 self._view.search_pdf_combo.setEnabled(False)
+                self.set_status_bar("file ready for ocr")
             #
             #self._view.update_labels("search", self.file_path)
         # tab 2 selected
@@ -100,21 +105,27 @@ class MainController(QObject):
             self.set_file_path()
             self.add_pages_to_list_view()
             print("tab 2")
+
         # tab 3
         if tab_number == 2:
             print("tab 3")
-
             self.set_multiple_file_paths()
             # check mime type to enable buttons
-            mime_type = mimetypes.guess_type(self.file_list[0])[0]
-            print(mime_type)
-            # # tests image type and converts
-            if mime_type  == "image/jpeg" :
-                self._view.join_images_save_file_button.setEnabled(True)
-                self._view.join_pdf_save_file_button.setEnabled(False)
-            if mime_type == "application/pdf":
-                self._view.join_pdf_save_file_button.setEnabled(True)
-                self._view.join_images_save_file_button.setEnabled(False)
+            if len(self.file_list) > 0:
+                mime_type = mimetypes.guess_type(self.file_list[0])[0]
+                print(mime_type)
+                # # tests image type and converts
+                if mime_type  == "image/jpeg" :
+                    self._view.join_images_save_file_button.setEnabled(True)
+                    self._view.join_pdf_save_file_button.setEnabled(False)
+                if mime_type == "application/pdf":
+                    self._view.join_pdf_save_file_button.setEnabled(True)
+                    self._view.join_images_save_file_button.setEnabled(False)
+            else:
+                self.set_status_bar("no files selected")
+                self.file_list = []
+                self._view.select_page_list.clear()
+
            
         # tab 4
         if tab_number == 3:
@@ -148,17 +159,16 @@ class MainController(QObject):
         if file_path:
             self.file_path = file_path
             self.set_status_bar("file path set")
+            self.set_log(f"file path {self.file_path} set")
         else:
             print("no file path set")
-            
-        # update feedback labels
-        print("open file path",self.file_path)
- 
+    #
+    #
     #
     def set_multiple_file_paths(self):
         file_list_in = []
         files = self._fileview.open_multiple_files_dialog()
-        if len(files) > 1:
+        if len(files) > 0:
             self.set_status_bar("multiple file paths set")    
             self._view.join_pdf_save_file_button.setEnabled(True)
             for path in files:
@@ -168,7 +178,7 @@ class MainController(QObject):
             #
             self.dialog = FeedbackWindow(file_list_in) # Pass self as parent for WindowModal
             if self.dialog.exec() == 1: # Shows the dialog modally
-                self._view.terminal_log.append(f"multiple files selected")
+                self.set_log(f"multiple files selected")
                 self._view.file_list_display.clear()
                 i = 1
                 for file in file_list_in:
@@ -179,9 +189,9 @@ class MainController(QObject):
                 # set file list values
                 self.file_list = file_list_in
             else:
-                self._view.terminal_log.append("File Operation Cancelled")
+                self.set_log("File Operation Cancelled")
         else:
-            self._view.status_bar_label.setText("files not selected")
+            self.set_status_bar("files not selected")
     #   
     # add page numbers to a file list view
     #
@@ -222,7 +232,7 @@ class MainController(QObject):
         level = self._view.search_pdf_combo.currentText()
         self.file_list = self.process_pdf_file_for_search(self.file_path, search_word, level)
         if len(self.file_list) == 0:
-            self._view.terminal_log.append("search result empty")
+            self.set_log("search result empty")
         self._view.search_save_pdf_label.setText(f"{len(self.file_list)} pages ready to merge")
     #   
     # returns number of text searchable pages or false if requires ocr
@@ -249,7 +259,7 @@ class MainController(QObject):
             l_ratio = levenshtein.ratio(search_word.lower(), word.lower())
             if l_ratio > float(level):
                 prt_string = f"word matched: {word}"
-                self._view.terminal_log.append(prt_string)
+                self.set_log(prt_string)
                 #print(f"word in: {search_word.lower()} | word found: {word.lower()} | lev ratio: {round(float(l_ratio), 2)}")
                 return l_ratio
     #
@@ -258,16 +268,16 @@ class MainController(QObject):
     # extracted to one file
     #
     def process_pdf_file_for_search(self, file_path, search_word, level):
-        self._view.terminal_log.append(f"pdf search path: {file_path} word: {search_word} level: {level}")
+        self.set_log(f"pdf search path: {file_path} word: {search_word} level: {level}")
         fuzzy_max = 0.0
         fuzzy_total = 0.0
-        self._view.status_bar_label.setText("Searching pdf for matches")
+        self.set_status_bar("Searching pdf for matches")
         page_list = []
         # in self._view if page list is greater than 0 the save button will be enabled
         reader = PdfReader(file_path)
         num_pages = len(reader.pages)
         # loop through pages
-        self._view.terminal_log.append(f"start of search for: {search_word} at level {level}")
+        self.set_log(f"start of search for: {search_word} at level {level}")
         for page_num in range(num_pages):
             page = reader.pages[page_num]
             text = page.extract_text()
@@ -288,20 +298,31 @@ class MainController(QObject):
             fuzzy_average = round(fuzzy_total/len(page_list), 1)
             search_found_stats = f"Highest match is {str(round(fuzzy_max,2))} and average match is {str(round(fuzzy_average,2))}"
             self._view.search_found_label.setText(search_found_stats)
-            self._view.status_bar_label.setText(f"search matched {len(page_list)}")
+            self.set_status_bar(f"search matched {len(page_list)}")
         else:
-            self._view.status_bar_label.setText("no results found")
+            self.set_status_bar("no results found")
         return page_list
     #
     # create a text searchable document
     #
+    async def run_ocr(self, output_pdf_path, skip_text, oversample, clean):
+
+        ocrmypdf.ocr(self.file_path, output_pdf_path, skip_text=skip_text, oversample=oversample, clean
+        =clean)
+
+
+
     def ocr_pdf_file(self):
+        self._view.ocr_pdf_label.setText("Running OCR of file")
         """
         Adds an OCR text layer to a scanned PDF, making it searchable.
         """
         output_pdf_path = "output/ocr_"+os.path.basename(self.file_path) 
-        self._view.status_bar_label.setText("ocr pdf")
-        ocrmypdf.ocr(self.file_path, output_pdf_path, skip_text=True, oversample=300, clean=True)
+
+        #ocrmypdf.ocr(self.file_path, output_pdf_path, skip_text=skip_text, oversample=oversample, clean=clean)
+        
+        asyncio.run(self.run_ocr(output_pdf_path, True, 300, True))
+
         print(f"OCR completed. Searchable PDF saved to: {output_pdf_path}")
         # sets the search path
         self.file_path = output_pdf_path
@@ -309,6 +330,8 @@ class MainController(QObject):
         #set buttons true
         self._view.search_pdf_button.setEnabled(True)
         self._view.search_pdf_combo.setEnabled(True)
+        self._view.ocr_pdf_label.setText("ocr complete")
+        self.set_status_bar("searchable file available")
     #
     # extract pages
     #
@@ -332,7 +355,7 @@ class MainController(QObject):
                 with open(output_pdf_path, "wb") as output_file:
                     writer.write(output_file)
                 print(f"Page {ind} extracted and saved as {output_pdf_path}")
-                self._view.terminal_log.append(f"Page {ind} extracted and saved as {output_pdf_path}")
+                self.set_log(f"Page {ind} extracted and saved as {output_pdf_path}")
             return output_pdf_path
 
         except FileNotFoundError:
@@ -343,19 +366,18 @@ class MainController(QObject):
     # merge pdfs
     #
     def merge_pdfs(self):
-        
         pdf_ext = ".pdf"
         file_list = self.file_list
         flag = self._view.auto_filename.isChecked()
-        self._view.status_bar_label.setText("merging pdf files")
+        self.set_status_bar("merging pdf files")
         # filename needs to be created for merged files
         if flag == 0:
             file_name = self._fileview.user_filename_input_dialog()
         else:
             ts = datetime.now().timestamp()
-            file_name = "output/merge_pdf"+str(ts)+".pdf"
+            file_name = "output/merge_pdf_"+str(ts)+".pdf"
         #
-        if file_name:
+        if len(file_list) > 0:
             # test if has pdf extension
             if pdf_ext.lower() in file_name.lower():
                 output_filename = file_name
@@ -366,26 +388,20 @@ class MainController(QObject):
             Merges a list of PDF files into a single output PDF.
             """
             merger = PdfWriter()
-
             try:
                 for pdf in file_list:
                     with open(pdf, 'rb') as pdf_file:
                         merger.append(pdf_file) 
-
                     with open(output_filename, 'wb') as output_file:
                         merger.write(output_file)
-
                 merger.close() 
-        
             except Exception as e:
                 print(f"Error saving file: {e}")
 
-            
-        
-            self._view.terminal_log.append(f"PDFs merged successfully:\n{output_filename}")
+            self.set_log(f"PDFs merged successfully:\n{output_filename}")
             print(f"PDFs merged successfully into {output_filename}")
         else:
-            self.set_status_bar("no file name supplied")
+            self.set_status_bar("no file name or path supplied")
     #
     # check if image conversion buttons are selected
     #
@@ -427,7 +443,7 @@ class MainController(QObject):
             enhancer = ImageEnhance.Brightness(images[i])
             adj_image = enhancer.enhance(brightness) # factor > 1 for brighter, < 1 for darker
             adj_image.save('output/images/page'+str(i)+"."+fmt_in)
-            self._view.terminal_log.append('saved: output/images/page'+str(i)+"."+fmt_in)
+            self.set_log('saved: output/images/page_'+str(i)+"."+fmt_in)
         
         print("extracted images", len(images))
         return "output/images", len(images)
@@ -441,7 +457,7 @@ class MainController(QObject):
             output_path = self._fileview.user_filename_input_dialog()          
         else:
             ts = datetime.now().timestamp()
-            output_path = "output/image_to_pdf"+str(ts)+".pdf"
+            output_path = "output/image_to_pdf_"+str(ts)+".pdf"
 
         if not self.file_list:
             print("No JPEG images found.")
@@ -467,7 +483,7 @@ class MainController(QObject):
             cv.convert(docx_file_path, start=0, end=None) # start and end pages (optional)
             cv.close()
             print(f"Successfully converted '{self.file_path}' to '{docx_file_path}'")
-            self._view.status_bar_label.setText("word file created")
+            self.set_status_bar("word file created")
         except Exception as e:
             print(f"Error converting PDF to Word: {e}")
     #
@@ -482,41 +498,50 @@ class MainController(QObject):
             text += page.extract_text() or "" # Use or "" to handle empty pages
         with open("output/"+filename+".txt", 'w') as f:
             f.write(text)
-        self._view.status_bar_label.setText("text file created")
+        self.set_status_bar("text file created")
     #
     # save pdf from a list of pages
     #
     def save_pdf_from_search(self):
         # all files saved to output
         page_list = self.file_list
-        # search specific term used to create output file
-        search_string = self._view.search_pdf_input_word.text()
-        self._view.status_bar_label.setText("save pdf")
-        now = datetime.now()
-        print("save pdf", self.file_path)
-        print("page list array", page_list)
-        reader = PdfReader(self.file_path)
-        if len(page_list) > 0:
-            writer = PdfWriter()
-            for page in page_list:
-                writer.add_page(reader.pages[page])
-            try:
-                out_path = f"output/{search_string}_{int(now.timestamp())}.pdf"
-                with open(out_path, "wb") as output_pdf:
-                    writer.write(output_pdf)
-                self._view.terminal_log.append(f"extracted pdf pages saved: {out_path}")
-                self._view.output_file_label.setText(f"Output Path: {out_path}")
-            except Exception as e:
-                self._view.terminal_log.append(f"Error saving file: {e}")
+        # get save to folder
+        folder_path = self._fileview.open_folder_dialog()
+        self.set_log(f"folder selected {folder_path}")
+        if folder_path:
+            # search specific term used to create output file
+            search_string = self._view.search_pdf_input_word.text()
+            self.set_status_bar("save pdf")
+            now = datetime.now()
+            print("save pdf", self.file_path)
+            print("page list array", page_list)
+            reader = PdfReader(self.file_path)
+            if len(page_list) > 0:
+                writer = PdfWriter()
+                for page in page_list:
+                    writer.add_page(reader.pages[page])
+                try:
+                    out_path = f"{folder_path}/{search_string}_{int(now.timestamp())}.pdf"
+                    with open(out_path, "wb") as output_pdf:
+                        writer.write(output_pdf)
+                    self.set_log(f"extracted pdf pages saved: {out_path}")
+                    self._view.output_file_label.setText(f"Output Path: {out_path}")
+                except Exception as e:
+                    self.set_log(f"Error saving file: {e}")
+            else:
+                self.set_log("no files in list save_pdf")
         else:
-            self._view.terminal_log.append("no files in list save_pdf")
-            
+            self.set_status_bar("no folder selected")
+                
         self._view.save_pdf_button.setEnabled(False)
     #
     # set status bar message
     #
     def set_status_bar(self, message):
-        self._view.status_bar_label.setText(message) 
+        self._view.status_bar_label.setText(message)
+
+    def set_log(self, message):
+        self._view.terminal_log.append(message) 
 
 if __name__ == "__main__":
 
