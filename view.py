@@ -5,10 +5,9 @@ from PySide6.QtWidgets import (
     QAbstractItemView, QTextEdit
 )
 from PySide6.QtCore import Qt, QRegularExpression
-import os, subprocess
-
 from PySide6.QtGui import QRegularExpressionValidator
 
+import os, subprocess
 
 class FeedbackWindow(QDialog):
 
@@ -107,7 +106,6 @@ class MainWindow(QMainWindow):
         # Create a QRegExp that matches any character except a space
         # The '+' means one or more occurrences of the allowed characters
         regex = QRegularExpression("[^ ]+") 
-        
         # Create a QRegExpValidator with the defined regex
         validator = QRegularExpressionValidator(regex)
         
@@ -124,7 +122,7 @@ class MainWindow(QMainWindow):
 
         self.ocr_pdf_button = QPushButton("ocr pdf")
         self.ocr_pdf_button.setEnabled(False)
-        self.ocr_pdf_label = QLabel("OCR Pending")
+        self.ocr_pdf_label = QLabel("OCR Status")
 
         self.search_save_pdf_label = QLabel("0 pages to merge")
 
