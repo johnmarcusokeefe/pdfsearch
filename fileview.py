@@ -1,17 +1,26 @@
 from PySide6.QtWidgets import (
     QFileDialog
 )
-import time, os
-from view import MainWindow
-
+import os
 #
-    # open file only. open files can be searched or converted so needs to be focused
-    #
+# file dialogues
+#
 class FileDialogue:
 
     def __init__(self):
         super().__init__()
+    #
+    # user selects the directory
+    #
+    def open_folder_dialog(self):
+        
+        folder_path = QFileDialog.getExistingDirectory(
+            None,
+            "Select Folder",  # Dialog title
+            str(self.last_path_opened)      # Last folder opened
+        )
 
+        return folder_path
     #    
     # Open a file dialog to select a single file
     #
@@ -34,7 +43,6 @@ class FileDialogue:
     def open_multiple_files_dialog(self):
 
         file_list = []
-
         self.last_path_opened = self.load_text()
         file_list, _ = QFileDialog.getOpenFileNames(
             None,
@@ -44,6 +52,7 @@ class FileDialogue:
         )
         # 
         print("open multiple files", file_list)
+        #
         return file_list
     
     #
