@@ -120,23 +120,22 @@ class MainWindow(QMainWindow):
         self.search_pdf_button = QPushButton("fuzzy search")
         self.search_pdf_button.setEnabled(False)
 
-        self.ocr_pdf_button = QPushButton("ocr pdf")
-        self.ocr_pdf_button.setEnabled(False)
-        self.ocr_pdf_label = QLabel("OCR Status")
-
+        # self.ocr_pdf_button = QPushButton("ocr pdf")
+        # self.ocr_pdf_button.setEnabled(False)
+        # self.ocr_pdf_label = QLabel("OCR Status")
         self.search_save_pdf_label = QLabel("0 pages to merge")
 
         self.save_pdf_button = QPushButton("save")
         self.save_pdf_button.setEnabled(False)
 
         tab_1_left.addWidget(self.search_open_file_label)
-        tab_1_left.addWidget(self.ocr_pdf_label)
+        #tab_1_left.addWidget(self.ocr_pdf_label)
         tab_1_left.addWidget(self.search_pdf_input_word)
         tab_1_left.addWidget(self.search_found_label)
         tab_1_left.addWidget(self.search_save_pdf_label)
 
         tab_1_right.addWidget(self.search_open_file_button)
-        tab_1_right.addWidget(self.ocr_pdf_button)
+        #tab_1_right.addWidget(self.ocr_pdf_button)
         tab_1_right.addWidget(self.search_pdf_combo)
         tab_1_right.addWidget(self.search_pdf_button)
         tab_1_right.addWidget(self.save_pdf_button)
