@@ -13,6 +13,7 @@ from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
 from pypdf import PdfReader, PdfWriter
+from multiprocessing import Process
 #gui
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QObject
@@ -93,14 +94,14 @@ class MainController(QObject):
         if tab_number == 0:
             self.set_file_path()
             self._view.search_open_file_label.setText(f"filepath: {self.file_path}")
-
+            # extracts text every 
             self.page_list = self.extract_text_pdfium()
             if len(self.page_list) > 0:
                 self._view.search_pdf_button.setEnabled(True)
                 self._view.search_pdf_combo.setEnabled(True)
-                self.set_status_bar("file ready for search")
+                self.set_status_bar(f"{len(self.page_list)} pages ready for search")
             else:
-                self._view.ocr_pdf_button.setEnabled(True)
+                #self._view.ocr_pdf_button.setEnabled(True)
                 self._view.search_pdf_button.setEnabled(False)
                 self._view.search_pdf_combo.setEnabled(False)
                 self.set_status_bar("file ready for ocr")
@@ -161,6 +162,7 @@ class MainController(QObject):
         #
         file_path = self._fileview.open_file_dialog()
         if file_path:
+            
             self.file_path = file_path
             self.set_status_bar("file path set")
             self.set_log(f"file path {self.file_path} set")
@@ -271,7 +273,7 @@ class MainController(QObject):
             print(f"Tesseract executable not found. Check your PATH or specify tesseract_cmd. Error: {e}")
         
     #       
-    # subfunction of pdf_search. searches one string
+    # subfunction of pdf_search. searches one page of text.
     #
     def fuzzy_word_comparison(self, text, search_word, level):
         found_list = []
@@ -282,11 +284,11 @@ class MainController(QObject):
             l_ratio = levenshtein.ratio(search_word.lower(), word.lower())
             print(f"text word: {word} search word: {search_word} ratio: {l_ratio} count: {i}")
             i = i + 1
+            # only adds if greater match found
             if l_ratio > float(level):
                 found_list.append(f"word found: {word} ratio: {l_ratio}")
-                count = i
         print(found_list)
-        return l_ratio, count
+        return l_ratio, i
 
     #
     # search through each page and carry out a fuzzy search logging found works
@@ -323,10 +325,10 @@ class MainController(QObject):
         print(f"pdf search page list: {page_list}")
         # stats
         if len(found_page_list) > 0:
-            fuzzy_average = round(fuzzy_total/len(page_list), 1)
+            fuzzy_average = fuzzy_total/len(found_page_list)
             search_found_stats = f"Highest match is {str(round(fuzzy_max,2))} and average match is {str(round(fuzzy_average,2))}"
             self.set_log(search_found_stats)
-            self.set_status_bar(f"search matched {len(page_list)}")
+            self.set_status_bar(f"search matched {len(self.page_list)}")
         else:
             self.set_status_bar("no results found")
         #
@@ -588,7 +590,15 @@ if __name__ == "__main__":
     view = MainWindow()
     fileview = FileDialogue()
     controller = MainController(view, fileview)
+
+    # Get a list of user-defined methods using dir()
+    methods_list = [method for method in dir(MainController) 
+                    if callable(getattr(MainController, method)) and not method.startswith("__")]
+
+    #print("User-defined methods:", methods_list)
+    # Output: User-defined methods: ['_internal_method', 'method1', 'method2']
+    for method_name in methods_list:
+        print(method_name)
     
     view.show()
     sys.exit(app.exec())
-
