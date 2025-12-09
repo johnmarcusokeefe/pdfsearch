@@ -20,6 +20,13 @@ class FileDialogue:
             str(self.last_path_opened)      # Last folder opened
         )
 
+    def open_folder_dialog(self):
+        
+        folder_path = QFileDialog.getExistingDirectory(
+            None,
+            "Select Folder",  # Dialog title
+            str(self.last_path_opened)      # Last folder opened
+        )
         return folder_path
     #    
     # Open a file dialog to select a single file
@@ -34,7 +41,7 @@ class FileDialogue:
             str(self.last_path_opened),      # Initial directory (can be an empty string for default)
             "PDF Files (*.pdf);;All Files (*.*)" # File filters
         )
-        print("open file dialog", file_path)
+        print("set filepath", file_path)
         self.save_text(file_path)
         return file_path
     #
@@ -83,5 +90,10 @@ class FileDialogue:
     #
     def save_text(self, output_path):
         file_name = "saved_path.txt"
-        with open(file_name,'w') as file:
-            file.write(os.path.dirname(output_path))
+        try:
+            with open(file_name,'w') as file:
+                file.write(os.path.dirname(output_path))
+            print("path saved")
+        except:
+            print("failed to save path")
+
