@@ -1,1 +1,1 @@
-/Users/johnokeefe/Python/test_data/11082025_odd_receipts_ocr
+C:/Users/johnm/Coding/Python/PDFSearch/pdfsearch
