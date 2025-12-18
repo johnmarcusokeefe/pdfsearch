@@ -120,22 +120,22 @@ class MainWindow(QMainWindow):
         self.search_pdf_button = QPushButton("fuzzy search")
         self.search_pdf_button.setEnabled(False)
 
-        # self.ocr_pdf_button = QPushButton("ocr pdf")
-        # self.ocr_pdf_button.setEnabled(False)
-        # self.ocr_pdf_label = QLabel("OCR Status")
+        self.ocr_pdf_button = QPushButton("ocr pdf")
+        self.ocr_pdf_button.setEnabled(False)
+        self.ocr_pdf_label = QLabel("OCR Status")
         self.search_save_pdf_label = QLabel("0 pages to merge")
 
         self.save_pdf_button = QPushButton("save")
         self.save_pdf_button.setEnabled(False)
 
         tab_1_left.addWidget(self.search_open_file_label)
-        #tab_1_left.addWidget(self.ocr_pdf_label)
+        tab_1_left.addWidget(self.ocr_pdf_label)
         tab_1_left.addWidget(self.search_pdf_input_word)
         tab_1_left.addWidget(self.search_found_label)
         tab_1_left.addWidget(self.search_save_pdf_label)
 
         tab_1_right.addWidget(self.search_open_file_button)
-        #tab_1_right.addWidget(self.ocr_pdf_button)
+        tab_1_right.addWidget(self.ocr_pdf_button)
         tab_1_right.addWidget(self.search_pdf_combo)
         tab_1_right.addWidget(self.search_pdf_button)
         tab_1_right.addWidget(self.save_pdf_button)
@@ -160,12 +160,12 @@ class MainWindow(QMainWindow):
         
         self.extract_pages_file_open_button = QPushButton("Open File")
         
-        self.split_pdf_save_file_button = QPushButton("Extract")
-        self.split_pdf_save_file_button.setEnabled(False)
+        self.extract_pages_save_file_button = QPushButton("Extract")
+        self.extract_pages_save_file_button.setEnabled(False)
         
         tab_2_left.addWidget(self.select_page_list)
         tab_2_right.addWidget(self.extract_pages_file_open_button, alignment=Qt.AlignTop)
-        tab_2_right.addWidget(self.split_pdf_save_file_button, alignment=Qt.AlignTop)
+        tab_2_right.addWidget(self.extract_pages_save_file_button, alignment=Qt.AlignTop)
 
         # ---------------
         # | Tab 3 layout |
@@ -183,7 +183,7 @@ class MainWindow(QMainWindow):
         self.file_list_display = QListWidget()
         self.file_list_display.setEnabled(False)
 
-        join_pdf_label = QLabel("Join\\Combine Selected Files:\nChoose: PDF, PNG or PDF")
+        join_pdf_label = QLabel("Join\\Combine Selected Files:\nChoose: PDF, PNG or JPG")
         self.join_pdf_select_multiple_files = QPushButton("Select Files")
         self.auto_filename = QCheckBox("Auto Filename")
         self.auto_filename.setChecked(False)
@@ -308,9 +308,9 @@ class MainWindow(QMainWindow):
     def check_extract_selection_enabled(self):
         selected_items = self.select_page_list.selectedItems()
         if len(selected_items) > 0:
-            self.split_pdf_save_file_button.setEnabled(True)
+            self.extract_pages_save_file_button.setEnabled(True)
         else:
-            self.split_pdf_save_file_button.setEnabled(False)
+            self.extract_pages_save_file_button.setEnabled(False)
     #
     # toggle log window open/closed
     #

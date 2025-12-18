@@ -1,10 +1,11 @@
 # controller.py
 # mac: source pdfsearch/bin/activate
-# windows: venv\Scripts\activate.bat
+# windows: .venv\Scripts\activate.bat
 
-import sys, os, mimetypes, img2pdf, warnings, re, ocrmypdf, asyncio
-import pypdfium2 as pdfium
+import sys, os, mimetypes, img2pdf, warnings, re, asyncio
+# import pypdfium2 as pdfium
 import pytesseract
+
 
 from PIL import ImageEnhance, Image
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
@@ -13,13 +14,14 @@ from datetime import datetime
 from pdf2image import convert_from_path
 from pdf2docx import Converter
 from pypdf import PdfReader, PdfWriter
-from multiprocessing import Process
+import threading
 #gui
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QObject
 # local files
 from view import MainWindow, FeedbackWindow
 from fileview import FileDialogue
+from fileprocess import ExtractText
 #
 # Subclass QMainWindow to customize your application's main window
 #
@@ -41,12 +43,12 @@ class MainController(QObject):
     def connect_signals(self):
         #tab1
         self._view.search_open_file_button.clicked.connect(self.call_selected_tab)
-        #self._view.ocr_pdf_button.clicked.connect(self.ocr_pdf_file)
+        self._view.ocr_pdf_button.clicked.connect(self.extract_text_pdfium)
         self._view.search_pdf_button.clicked.connect(self.search_pdf)
         self._view.save_pdf_button.clicked.connect(self.save_pdf_from_search)
         # tab2
         self._view.extract_pages_file_open_button.clicked.connect(self.call_selected_tab)
-        self._view.split_pdf_save_file_button.clicked.connect(self.extract_pages)
+        self._view.extract_pages_save_file_button.clicked.connect(self.extract_pages)
         # tab3
         self._view.join_pdf_select_multiple_files.clicked.connect(self.call_selected_tab)
         self._view.join_pdf_save_file_button.clicked.connect(self.merge_pdfs)
@@ -91,18 +93,23 @@ class MainController(QObject):
         
         tab_number = self._view.tab_widget.currentIndex()
         print("call_selected_tab method", tab_number + 1)
+        is_text = False
         if tab_number == 0:
             self.set_file_path()
             self._view.search_open_file_label.setText(f"filepath: {self.file_path}")
+            page_count, is_text = self.check_pdf()
+            
+           
             # extracts text every 
-            self.page_list = self.extract_text_pdfium()
-            if len(self.page_list) > 0:
+            print(self.page_list)
+            if is_text == True:
                 self._view.search_pdf_button.setEnabled(True)
                 self._view.search_pdf_combo.setEnabled(True)
                 self.set_status_bar(f"{len(self.page_list)} pages ready for search")
             else:
-                #self._view.ocr_pdf_button.setEnabled(True)
+                self._view.ocr_pdf_button.setEnabled(True)
                 self._view.search_pdf_button.setEnabled(False)
+                self._view.ocr_pdf_button.setText(f"{page_count} pages ready to OCR")
                 self._view.search_pdf_combo.setEnabled(False)
                 self.set_status_bar("file ready for ocr")
 
@@ -146,7 +153,7 @@ class MainController(QObject):
             self.set_file_path()
             self._view.extract_pdf_content_label.setText(f"Extract PDF Filepath: {self.file_path}")
             # test if text
-            num_pages = self.check_pdf()
+            num_pages, is_text = self.check_pdf()
             self.set_status_bar(f"{num_pages} pages found with text")
             if num_pages == 0:
                 self.ocr_pdf_file() 
@@ -202,8 +209,8 @@ class MainController(QObject):
     # add page numbers to a file list view
     #
     def add_pages_to_list_view(self):
-        self._view.split_pdf_save_file_button.setEnabled(True)
-        page_count = self.check_pdf()
+        self._view.extract_pages_save_file_button.setEnabled(True)
+        page_count, is_text = self.check_pdf()
         print("extract pages", page_count)
         # loads list of files
         if page_count > 0:
@@ -213,7 +220,7 @@ class MainController(QObject):
             self.set_status_bar("pages selected")
         else:
             self.set_status_bar("file selection requires more than one page")
-            self.split_pdf_save_file_button.setEnabled(False)
+            self._view.extract_pages_save_file_button.setEnabled(False)
     #
     #
     #
@@ -237,7 +244,7 @@ class MainController(QObject):
         # get an interger value to set levenshtein level
         level = self._view.search_pdf_combo.currentText()
         self.file_list = self.process_pdf_file_for_search(search_word, level)
-
+        print(self.file_list)
         if len(self.file_list) == 0:
             self.set_log("search result empty")
         self._view.search_save_pdf_label.setText(f"{len(self.file_list)} pages ready to merge")
@@ -247,16 +254,16 @@ class MainController(QObject):
     def check_pdf(self):   
         # You can now open and process the file content
         reader = PdfReader(self.file_path)
+        is_text = True
         num_pages = len(reader.pages)
         for page_num in range(num_pages):
             page = reader.pages[page_num]
             text = page.extract_text()
             # search text on page and if text found create an array of page numbers
-            if text == "":
-                return 0
-            else:
-                #self.page_count_label.setText(f"Page count: {num_pages}")
-                return num_pages
+        if text == "":
+            is_text = False
+            #self.page_count_label.setText(f"Page count: {num_pages}")
+        return num_pages, is_text
 
     #        
     def extract_text_from_image(self, file_path_in):
@@ -279,14 +286,14 @@ class MainController(QObject):
         found_list = []
         l_ratio = 0
         i = 0
-        count = 0
         for word in text.split():
             l_ratio = levenshtein.ratio(search_word.lower(), word.lower())
-            print(f"text word: {word} search word: {search_word} ratio: {l_ratio} count: {i}")
-            i = i + 1
             # only adds if greater match found
             if l_ratio > float(level):
+                i = i + 1
+                self.set_log(f"text word: {word} search word: {search_word} ratio: {l_ratio} count: {i}")
                 found_list.append(f"word found: {word} ratio: {l_ratio}")
+
         print(found_list)
         return l_ratio, i
 
@@ -322,7 +329,7 @@ class MainController(QObject):
                 self._view.save_pdf_button.setEnabled(True)
                 self.set_status_bar(f"total matches {found_count}")
         
-        print(f"pdf search page list: {page_list}")
+        print(f"pdf search page list: {found_page_list}")
         # stats
         if len(found_page_list) > 0:
             fuzzy_average = fuzzy_total/len(found_page_list)
@@ -336,27 +343,35 @@ class MainController(QObject):
     #
     # create a text searchable document
     #
-    # async def run_ocr(self, output_pdf_path, skip_text, oversample, clean):
+    #def run_ocr(self, output_pdf_path, skip_text, oversample, clean):
 
-    #     ocrmypdf.ocr(self.file_path, output_pdf_path, skip_text=skip_text, oversample=oversample, clean
-    #     =clean)
+    #    ocrmypdf.ocr(self.file_path, output_pdf_path, skip_text=skip_text, oversample=oversample, clean=clean)
     #
     #
     #
     def extract_text_pdfium(self):
         
-        page_array = []
-        if self.file_path:
-            pdf = pdfium.PdfDocument(self.file_path)
-            for i, page in enumerate(pdf):
-                img = page.render(scale=300/72).to_pil()
-                text = pytesseract.image_to_string(img)
-                # print(f"--- Start Page {i+1} ---")
-                # print(text)
-                page_array.append(text)
+        #page_array = []
+        # if self.file_path:
 
-        return page_array
-    #
+        #     pdf = pdfium.PdfDocument(self.file_path)
+        #     for i, page in enumerate(pdf):
+        #         img = page.render(scale=300/72).to_pil()
+        #         text = pytesseract.image_to_string(img)
+        #         # print(f"--- Start Page {i+1} ---")
+        #         # print(text)
+        #         page_array.append(text)
+        et = ExtractText()
+        
+        thread = threading.Thread(target=et.extract_text, args=(self.file_path, self.page_list, self))
+        thread.start()
+       
+        #print(page_array)
+        #self.thread.join()
+
+        #return page_array 
+#
+    
     def ocr_pdf_file(self):
         self._view.ocr_pdf_label.setText("Running OCR of file")
         """
@@ -590,15 +605,8 @@ if __name__ == "__main__":
     view = MainWindow()
     fileview = FileDialogue()
     controller = MainController(view, fileview)
-
-    # Get a list of user-defined methods using dir()
-    methods_list = [method for method in dir(MainController) 
-                    if callable(getattr(MainController, method)) and not method.startswith("__")]
-
-    #print("User-defined methods:", methods_list)
-    # Output: User-defined methods: ['_internal_method', 'method1', 'method2']
-    for method_name in methods_list:
-        print(method_name)
+    
+    
     
     view.show()
     sys.exit(app.exec())
