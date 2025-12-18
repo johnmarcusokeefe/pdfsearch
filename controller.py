@@ -606,7 +606,5 @@ if __name__ == "__main__":
     fileview = FileDialogue()
     controller = MainController(view, fileview)
     
-    
-    
     view.show()
     sys.exit(app.exec())
