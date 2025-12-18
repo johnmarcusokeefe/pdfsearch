@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-C:/Users/johnm/Coding/Python/PDFSearch/pdfsearch
-=======
-/Users/johnokeefe/Python/output
->>>>>>> fac572f11e038f59e62e9e1bbaa26e31dd5c0617
+C:/Users/johnm/Coding/Python/PDFSearch/pdfsearch/output
