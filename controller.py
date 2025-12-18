@@ -1,6 +1,7 @@
 # controller.py
 # mac: source pdfsearch/bin/activate
 # windows: .venv\Scripts\activate.bat
+# git PC 
 
 import sys, os, mimetypes, img2pdf, warnings, re, asyncio
 # import pypdfium2 as pdfium
