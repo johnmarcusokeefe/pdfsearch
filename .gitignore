@@ -14,8 +14,6 @@ __pycache__/
 # Other common ignore patterns
 .DS_Store
 ._*
-pdfsearch/
-output/
-test_data/
-create_filename.pdf.docx
-saved_path.txt
+pdfsearch/pdfsearch
+pdfsearch/output/
+pdfsearch/test_data/
